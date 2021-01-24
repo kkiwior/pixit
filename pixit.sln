@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pixit.Server", "pixit\Server\pixit.Server.csproj", "{83829B43-B16C-431C-A822-FA79A9D15E19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pixit.Client", "pixit\Client\pixit.Client.csproj", "{F24AF6FC-C064-4197-B06F-D700D798534C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pixit.Shared", "pixit\Shared\pixit.Shared.csproj", "{420CC77F-EBED-4756-B569-EA2C3B728AD6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83829B43-B16C-431C-A822-FA79A9D15E19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83829B43-B16C-431C-A822-FA79A9D15E19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83829B43-B16C-431C-A822-FA79A9D15E19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83829B43-B16C-431C-A822-FA79A9D15E19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F24AF6FC-C064-4197-B06F-D700D798534C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F24AF6FC-C064-4197-B06F-D700D798534C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F24AF6FC-C064-4197-B06F-D700D798534C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F24AF6FC-C064-4197-B06F-D700D798534C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{420CC77F-EBED-4756-B569-EA2C3B728AD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{420CC77F-EBED-4756-B569-EA2C3B728AD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{420CC77F-EBED-4756-B569-EA2C3B728AD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{420CC77F-EBED-4756-B569-EA2C3B728AD6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {73314F73-E2D4-4FF9-8B75-0C723D878DB3}
+	EndGlobalSection
+EndGlobal
