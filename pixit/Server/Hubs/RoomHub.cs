@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using pixit.Server.Models;
 using pixit.Server.Services;
+using pixit.Shared.Models;
 
 namespace pixit.Server.Hubs
 {

@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using pixit.Client.Services;
+using pixit.Client.Shared;
 
 namespace pixit.Client
 {
@@ -16,7 +17,9 @@ namespace pixit.Client
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.Services.AddScoped<WSService>();
+            builder.Services.AddScoped<SignalRService>();
+            builder.Services.AddScoped<SendEventService>();
+            builder.Services.AddScoped<Mediator>();
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

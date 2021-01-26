@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace pixit.Server.Models
+namespace pixit.Shared.Models
 {
     public class UserModel
     {

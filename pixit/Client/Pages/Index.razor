@@ -1,11 +1,7 @@
 ﻿@page "/"
-@using pixit.Client.Services
-@using pixit.Server.Models
-@inject NavigationManager NavigationManager
-@inject WSService wss
 
 <div class="col-sm-12 col-md-10 col-xl-6 center-block">
-    <div class="card primary h-100">
+    <div class="card primary rounded-0 h-100">
         <EditForm Model="@User" OnValidSubmit="@Submit">
             <DataAnnotationsValidator />
             <div class="form-group">
@@ -19,18 +15,3 @@
         </EditForm>
     </div>
 </div>
-
-
-@code
-{
-    private UserModel User = new UserModel();
-
-    private Task Submit()
-    {
-        wss.UserJoin(User);
-        NavigationManager.NavigateTo("rooms");
-        return Task.CompletedTask;
-    }
-
-
-}

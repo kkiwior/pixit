@@ -13,5 +13,9 @@
     <ProjectReference Include="..\Shared\pixit.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers" />
+  </ItemGroup>
+
 
 </Project>

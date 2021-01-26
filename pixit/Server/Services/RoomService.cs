@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using pixit.Server.Models;
+using pixit.Shared.Models;
 
 namespace pixit.Server.Services
 {
