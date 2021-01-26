@@ -7,8 +7,11 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using pixit.Client.Services;
 using pixit.Client.Shared;
+using pixit.Client.Utils;
 
 namespace pixit.Client
 {
@@ -20,6 +23,7 @@ namespace pixit.Client
             builder.Services.AddScoped<SignalRService>();
             builder.Services.AddScoped<SendEventService>();
             builder.Services.AddScoped<Mediator>();
+            builder.Services.AddBlazoredLocalStorage();
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

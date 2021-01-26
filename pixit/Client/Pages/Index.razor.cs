@@ -1,29 +1,32 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using pixit.Client.Services;
 using pixit.Shared.Models;
 
 namespace pixit.Client.Pages
 {
-    public partial class Index : ComponentBase
+    public partial class Index
     {
-        //[Inject] private Mediator Mediator { get; set; }
-        [Inject] protected SendEventService Event { get; set; }
-        [Inject] protected NavigationManager Navigation { get; set; }
+        [Inject] private ILocalStorageService LocalStorage { get; set; }
+        [Inject] private NavigationManager Navigation { get; set; }
         
-        private UserModel User = new UserModel();
+        private UserModel User = new();
         
         protected override async Task OnInitializedAsync()
         {
-            // tu bedzie potem logika sprawdzajaca czy jest cookie i czy w grze a jak tak to bedzie powrot do gry 
+            string username = await LocalStorage.GetItemAsync<string>("username");
+            if (!String.IsNullOrEmpty(username))
+            {
+                User.Name = username;
+                await Submit();
+            }
         }
 
-        private Task Submit()
+        private async Task Submit()
         {
-            //cookie
-            Event.UserJoin(User);
+            await LocalStorage.SetItemAsync("username", User.Name);
             Navigation.NavigateTo("lobby");
-            return Task.CompletedTask;
         }
     }
 }

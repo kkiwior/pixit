@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace pixit.Client.Shared
+namespace pixit.Client.Utils
 {
     public abstract class ListenerBase
     {

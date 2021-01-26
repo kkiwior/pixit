@@ -1,45 +1,60 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using pixit.Client.Services;
 using pixit.Client.Shared;
+using pixit.Client.Utils;
 using pixit.Shared.Models;
 
 namespace pixit.Client.Pages
 {
-    public partial class Lobby : ComponentBase
+    public partial class Lobby : IDisposable
     {
-        [Inject] protected Mediator Mediator { get; set; }
-        [Inject] protected SendEventService Event  { get; set; }
-        private Modal Modal  { get; set; }
+        [Inject] private ILocalStorageService LocalStorage { get; set; }
+        [Inject] private Mediator Mediator { get; set; }
+        [Inject] private SendEventService Event  { get; set; }
+        [Inject] private NavigationManager Navigation { get; set; }
 
-        private CreateRoomModel CreateRoomForm = new CreateRoomModel();
-        List<RoomModel> _roomList = new List<RoomModel>();
+        private Modal _modal = new();
 
+        private CreateRoomModel CreateRoomForm = new();
+        Dictionary<string, RoomModel> _roomList = new();
+        
         protected override async Task OnInitializedAsync()
         {
-            await Mediator.Register<UserModel>(HandleUserJoined);
-            await Mediator.Register<List<RoomModel>>(HandleGetRooms);
+            if(String.IsNullOrEmpty(await LocalStorage.GetItemAsync<string>("username"))) Navigation.NavigateTo("");
+
+            await Mediator.Register<Dictionary<string, RoomModel>>(HandleGetRooms);
+            await Mediator.Register<KeyValuePair<string, RoomModel>>(HandleGetRoom);
         }
 
-        protected Task HandleUserJoined(UserModel user)
+        public void Dispose()
         {
-            return Task.CompletedTask;
-            // tu bd jakiś token coś
+            Mediator.Unregister<Dictionary<string, RoomModel>>();
+            Mediator.Unregister<KeyValuePair<string, RoomModel>>();
         }
 
-        protected Task HandleGetRooms(List<RoomModel> rooms)
+        protected Task HandleGetRooms(Dictionary<string, RoomModel> rooms)
         {
             _roomList = rooms;
             StateHasChanged();
             return Task.CompletedTask;
         }
 
-        private void CreateRoomDialog() => Modal.Toggle();
-        private void CreateRoom()
+        protected Task HandleGetRoom(KeyValuePair<string, RoomModel> room)
         {
-            Event.CreateRoom(CreateRoomForm);
-            Modal.Toggle();
+            _roomList.Add(room.Key, room.Value);
+            StateHasChanged();
+            return Task.CompletedTask;
+        } 
+
+        private void CreateRoomDialog() => _modal.Toggle();
+        private async void CreateRoom()
+        {
+            await Event.CreateRoom(CreateRoomForm);
+            _modal.Toggle();
         }
     }
 }

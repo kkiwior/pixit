@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace pixit.Client.Shared
+namespace pixit.Client.Utils
 {
     public class Mediator
     {
@@ -20,6 +20,14 @@ namespace pixit.Client.Shared
             }
 
             return Task.CompletedTask;
+        }
+
+        public void Unregister<T>()
+        {
+            lock (this._listeners)
+            {
+                this._listeners.Remove(this._listeners.OfType<Listener<T>>().FirstOrDefault());
+            }
         }
 
         public Task Notify<T>(T data)

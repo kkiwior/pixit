@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.AspNetCore.SignalR.Client;
-using pixit.Client.Shared;
+using pixit.Client.Utils;
 using pixit.Shared.Models;
 
 namespace pixit.Client.Services
@@ -15,7 +15,7 @@ namespace pixit.Client.Services
         {
             _mediator = mediator;
             HubConnection = new HubConnectionBuilder()
-                .WithUrl(client.BaseAddress.AbsoluteUri + "roomhub")
+                .WithUrl(client.BaseAddress?.AbsoluteUri + "roomhub")
                 .Build();
 
             HubConnection.StartAsync();
@@ -24,8 +24,8 @@ namespace pixit.Client.Services
         
         private void RegisterActions()
         {
-            HubConnection.On<UserModel>("UserJoined", (user) => _mediator.Notify<UserModel>(user));
-            HubConnection.On<List<RoomModel>>("GetRooms", (rooms) => _mediator.Notify<List<RoomModel>>(rooms));
+            HubConnection.On<Dictionary<string, RoomModel>>("SendRooms", rooms => _mediator.Notify(rooms));
+            HubConnection.On<KeyValuePair<string, RoomModel>>("SendRoom", rooms => _mediator.Notify(rooms));
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using pixit.Server.Services;
 using pixit.Shared.Models;
@@ -11,28 +7,28 @@ namespace pixit.Server.Hubs
 {
     public class RoomHub : Hub
     {
-        private RoomService _rooms;
+        private readonly RoomService _rooms;
 
-        public RoomHub(RoomService RoomService)
+        public RoomHub(RoomService roomService)
         {
-            _rooms = RoomService;
+            _rooms = roomService;
         }
 
-        public async Task UserJoin(UserModel User)
+        public override async Task OnConnectedAsync()
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Rooms");
-            await this.GetRooms();
+            await this.SendRooms();
         }
 
-        public async Task GetRooms()
+        public async Task SendRooms()
         {
-            await Clients.Caller.SendAsync("GetRooms", await _rooms.GetRooms());
+            await Clients.Caller.SendAsync("SendRooms", _rooms.GetRooms());
         }
 
         public async Task CreateRoom(RoomModel roomData)
         {
-            await _rooms.Create(roomData);
-            await Clients.Group("Rooms").SendAsync("GetRooms", await _rooms.GetRooms());
+            var room = await _rooms.Create(roomData);
+            await Clients.Group("Rooms").SendAsync("SendRoom", room);
         }
     }
 }

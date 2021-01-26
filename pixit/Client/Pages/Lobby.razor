@@ -9,18 +9,18 @@
     </button>
 </div>
 <div class="col-sm-12 col-md-10 col-xl-6 center-block">
-    @foreach (var room in _roomList)
+    @foreach (var id in _roomList.Keys)
     {
         <div class="card room primary mt-2 rounded-0">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 col-md-6 my-auto">
-                        @room.Name
+                        @_roomList[id].Name
                     </div>
                     <div class="col-12 col-md-6 text-right">
-                        <div><span class="infolabel">Graczy: </span>@room.UsersOnline/@room.Slots</div>
-                        <div><span class="infolabel">Talia kart: </span>@room.CardsCount</div>
-                        <div><span class="infolabel">Max. punktów: </span>@room.MaxScore</div>
+                        <div><span class="infolabel">Graczy: </span>@_roomList[id].UsersOnline/@_roomList[id].Slots</div>
+                        <div><span class="infolabel">Talia kart: </span>@_roomList[id].CardsCount</div>
+                        <div><span class="infolabel">Max. punktów: </span>@_roomList[id].MaxScore</div>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
 </div>
 
 
-<Modal @ref="Modal">
+<Modal @ref="_modal">
     <Title>Tworzenie pokoju</Title>
     <Body>
             <EditForm Model="@CreateRoomForm" OnValidSubmit="@CreateRoom">
