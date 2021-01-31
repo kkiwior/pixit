@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using pixit.Shared.Models;
+using pixit.Shared.Models.Events;
 
 namespace pixit.Client.Services
 {
@@ -13,5 +14,8 @@ namespace pixit.Client.Services
         }
         
         public async Task CreateRoom(CreateRoomModel room) => await _signalr.HubConnection.SendAsync("CreateRoom", room);
+        public async Task UserJoinRoom(JoinRoomEvent session) => await _signalr.HubConnection.SendAsync("UserJoinRoom", session);
+
+        public async Task GetRoomInfo(JoinRoomEvent session) => await _signalr.HubConnection.SendAsync("GetRoomInfo", session);
     }
 }

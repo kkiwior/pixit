@@ -1,6 +1,6 @@
 ﻿@page "/lobby"
 
-<div class="col-12 text-center">
+<div class="col-12 text-center p-2">
     <button class="btn secondary" @onclick="CreateRoomDialog">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -8,10 +8,10 @@
         <span style="vertical-align: middle;">Stwórz pokój</span>
     </button>
 </div>
-<div class="col-sm-12 col-md-10 col-xl-6 center-block">
+<div class="col-sm-12 col-md-8 col-xl-4 center-block">
     @foreach (var id in _roomList.Keys)
     {
-        <div class="card room primary mt-2 rounded-0">
+        <div class="card room primary mt-2 rounded-0" @onclick="@(() => JoinRoom(id))">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 col-md-6 my-auto">
@@ -39,25 +39,24 @@
                     <InputText id="name" @bind-Value="CreateRoomForm.Name" class="form-control" />
                     <ValidationMessage For="()=> CreateRoomForm.Name" />
                 </div>
-                <div class="form-group">
-                    <label for="slots" class="form-label">Liczba graczy: @CreateRoomForm.Slots</label>
-                    <input type="range" min="2" max="20" class="form-range" id="slots" style="width: 100%;" value="@CreateRoomForm.Slots" @oninput="@((args) => @CreateRoomForm.Slots = Convert.ToInt32( args.Value))">
-                    <ValidationMessage For="()=> CreateRoomForm.Slots" />
-                </div>                
-                 <div class="form-group">
-                     <label for="score" class="form-label">Liczba punktów: @CreateRoomForm.MaxScore</label>
-                     <input type="range" min="5" max="100" class="form-range" id="score" style="width: 100%;" value="@CreateRoomForm.MaxScore" @oninput="@((args) => @CreateRoomForm.MaxScore = Convert.ToInt32( args.Value))">
-                     <ValidationMessage For="()=> CreateRoomForm.MaxScore" />
-                </div>    
-              <button class="btn secondary">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                      </svg>
-                      <span style="vertical-align: middle;">Stwórz</span>
-                  </button>          
+                @* <div class="form-group"> *@
+                @*     <label for="slots" class="form-label">Liczba graczy: @CreateRoomForm.Slots</label> *@
+                @*     <input type="range" min="2" max="20" class="form-range" id="slots" style="width: 100%;" value="@CreateRoomForm.Slots" @oninput="@((args) => @CreateRoomForm.Slots = Convert.ToInt32( args.Value))"> *@
+                @*     <ValidationMessage For="()=> CreateRoomForm.Slots" /> *@
+                @* </div>                 *@
+                @*  <div class="form-group"> *@
+                @*      <label for="score" class="form-label">Liczba punktów: @CreateRoomForm.MaxScore</label> *@
+                @*      <input type="range" min="5" max="100" class="form-range" id="score" style="width: 100%;" value="@CreateRoomForm.MaxScore" @oninput="@((args) => @CreateRoomForm.MaxScore = Convert.ToInt32( args.Value))"> *@
+                @*      <ValidationMessage For="()=> CreateRoomForm.MaxScore" /> *@
+                @* </div>     *@
+                <div class="text-center">
+                    <button class="btn secondary m-2">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                           <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                       </svg>
+                       <span style="vertical-align: middle;">Stwórz</span>
+                   </button>                     
+                </div>
             </EditForm>
     </Body>
-    <Footer>
-
-    </Footer>
 </Modal>

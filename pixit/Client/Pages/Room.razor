@@ -1,0 +1,15 @@
+﻿@page "/room/{RoomId}"
+@using pixit.Shared.Models
+
+<h3>Room</h3>
+@RoomId
+
+<div>
+@if (RoomInfo?.UsersOnline > 0)
+{
+    @foreach (UserModel user in RoomInfo?.Users)
+    {
+        <Avatar Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="150"/>
+    } 
+}
+</div>

@@ -1,16 +1,24 @@
-﻿<div class="modal center-block" tabindex="-1" role="dialog" style="display: @(display ? "block" : "none");">
-    <div class="modal-dialog-centered modal-md" role="document" style="margin-left: auto; margin-right:  auto;">
-        <div class="modal-content primary rounded-0">
-            <div class="modal-header">
-                <h5 class="modal-title">@Title</h5>
-                <button type="button" class="close validation-message" data-dismiss="modal" aria-label="Close" @onclick="Toggle"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-                @Body
-            </div>
-            <div class="modal-footer">
-                @Footer
+﻿@if (display)
+{
+    <div class="overlay">
+        <div class='modal fade center-block @(display ? "fade-in" : "")' tabindex="-1" aria-modal="true" role="dialog">
+            <div class="modal-dialog-centered modal-sm">
+                <div class="modal-content primary rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="Toggle"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        @Body
+                    </div>
+                    @if (Footer != null)
+                    {
+                        <div class="modal-footer">
+                            @Footer
+                        </div>                   
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
+}

@@ -1,0 +1,30 @@
+﻿@font-face {
+    font-family: 'icons';
+    src: url('images/utils/icons.ttf') format('truetype');
+}
+[class*='icon-']:before{
+    font-family: 'icons';
+    font-style: normal;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    color: var(--secondary);
+}
+.icon-left-arrow:before{content:'\0041';}
+.icon-right-arrow:before{content:'\0042';}
+.icon-male:before{content:'\0043'; color: #193664 !important;}
+.icon-female:before{content:'\0044'; color: #884c84 !important;}
+
+button:not([type=submit]) {
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.male, .female { font-size: 28px; }
+
+.controlLabel {
+    line-height: 17px;
+    font-size: 15px;
+}

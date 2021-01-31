@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
@@ -7,6 +8,7 @@ using pixit.Client.Services;
 using pixit.Client.Shared;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
+using pixit.Shared.Models.Events;
 
 namespace pixit.Client.Pages
 {
@@ -18,16 +20,25 @@ namespace pixit.Client.Pages
         [Inject] private NavigationManager Navigation { get; set; }
 
         private Modal _modal = new();
+        private UserModel User;
 
         private CreateRoomModel CreateRoomForm = new();
         Dictionary<string, RoomModel> _roomList = new();
         
         protected override async Task OnInitializedAsync()
         {
-            if(String.IsNullOrEmpty(await LocalStorage.GetItemAsync<string>("username"))) Navigation.NavigateTo("");
+            User = await LocalStorage.GetItemAsync<UserModel>("user");
+            if (User == null) Navigation.NavigateTo("");
 
             await Mediator.Register<Dictionary<string, RoomModel>>(HandleGetRooms);
             await Mediator.Register<KeyValuePair<string, RoomModel>>(HandleGetRoom);
+            await Mediator.Register<JoinRoomEvent>(HandleJoinRoom);
+        }
+
+        protected async Task HandleJoinRoom(JoinRoomEvent room)
+        {
+            await LocalStorage.SetItemAsync("token", room.Token);
+            Navigation.NavigateTo("/room/" + room.RoomId);
         }
 
         public void Dispose()
@@ -53,8 +64,20 @@ namespace pixit.Client.Pages
         private void CreateRoomDialog() => _modal.Toggle();
         private async void CreateRoom()
         {
+            Validator.TryValidateObject(User, new ValidationContext(User), null, true);
+            await LocalStorage.SetItemAsync<UserModel>("user", User);
+            CreateRoomForm.User = User;
             await Event.CreateRoom(CreateRoomForm);
             _modal.Toggle();
+        }
+
+        private async void JoinRoom(string id)
+        {
+            await Event.UserJoinRoom(new JoinRoomEvent()
+            {
+                RoomId = id,
+                User = User
+            });
         }
     }
 }

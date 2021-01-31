@@ -3,6 +3,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.SignalR.Client;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
+using pixit.Shared.Models.Events;
 
 namespace pixit.Client.Services
 {
@@ -26,6 +27,9 @@ namespace pixit.Client.Services
         {
             HubConnection.On<Dictionary<string, RoomModel>>("SendRooms", rooms => _mediator.Notify(rooms));
             HubConnection.On<KeyValuePair<string, RoomModel>>("SendRoom", rooms => _mediator.Notify(rooms));
+            HubConnection.On<JoinRoomEvent>("JoinRoomEvent", rooms => _mediator.Notify(rooms));
+            HubConnection.On<RoomModel>("RoomInfo", rooms => _mediator.Notify(rooms));
+            HubConnection.On<UserModel>("UserJoinedRoom", rooms => _mediator.Notify(rooms));
         }
     }
 }
