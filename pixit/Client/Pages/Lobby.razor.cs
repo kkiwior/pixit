@@ -23,15 +23,15 @@ namespace pixit.Client.Pages
         private UserModel User;
 
         private CreateRoomModel CreateRoomForm = new();
-        Dictionary<string, RoomModel> _roomList = new();
+        Dictionary<string, LobbyListEvent> _roomList = new();
         
         protected override async Task OnInitializedAsync()
         {
             User = await LocalStorage.GetItemAsync<UserModel>("user");
             if (User == null) Navigation.NavigateTo("");
 
-            await Mediator.Register<Dictionary<string, RoomModel>>(HandleGetRooms);
-            await Mediator.Register<KeyValuePair<string, RoomModel>>(HandleGetRoom);
+            await Mediator.Register<Dictionary<string, LobbyListEvent>>(HandleGetRooms);
+            await Mediator.Register<KeyValuePair<string, LobbyListEvent>>(HandleGetRoom);
             await Mediator.Register<JoinRoomEvent>(HandleJoinRoom);
         }
 
@@ -43,18 +43,18 @@ namespace pixit.Client.Pages
 
         public void Dispose()
         {
-            Mediator.Unregister<Dictionary<string, RoomModel>>();
-            Mediator.Unregister<KeyValuePair<string, RoomModel>>();
+            Mediator.Unregister<Dictionary<string, LobbyListEvent>>();
+            Mediator.Unregister<KeyValuePair<string, LobbyListEvent>>();
         }
 
-        protected Task HandleGetRooms(Dictionary<string, RoomModel> rooms)
+        protected Task HandleGetRooms(Dictionary<string, LobbyListEvent> rooms)
         {
             _roomList = rooms;
             StateHasChanged();
             return Task.CompletedTask;
         }
 
-        protected Task HandleGetRoom(KeyValuePair<string, RoomModel> room)
+        protected Task HandleGetRoom(KeyValuePair<string, LobbyListEvent> room)
         {
             _roomList.Add(room.Key, room.Value);
             StateHasChanged();

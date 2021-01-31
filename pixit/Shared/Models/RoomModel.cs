@@ -22,7 +22,6 @@ namespace pixit.Shared.Models
             get => Users.Count;
         }
         public int CardsCount { get; set; }
-        [JsonIgnore]
         public string Host { get; set; }
         public bool Started { get; set; }
     }

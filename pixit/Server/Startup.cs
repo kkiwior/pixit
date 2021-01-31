@@ -7,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using pixit.Server.Hubs;
 using pixit.Server.Services;
+using StackExchange.Redis.Extensions.Core;
+using StackExchange.Redis.Extensions.Core.Configuration;
+using StackExchange.Redis.Extensions.Newtonsoft;
 
 namespace pixit.Server
 {
@@ -23,7 +26,12 @@ namespace pixit.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSignalR();
+            services.AddSignalR().AddNewtonsoftJsonProtocol();
+            services.AddSingleton<ISerializer, NewtonsoftSerializer>();
+            services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>((options) =>
+            {
+                return Configuration.GetSection("Redis").Get<RedisConfiguration>();
+            });
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSingleton<RoomService>();
@@ -49,6 +57,7 @@ namespace pixit.Server
                 app.UseHsts();
             }
 
+            app.UserRedisInformation();
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();

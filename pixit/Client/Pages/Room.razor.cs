@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using pixit.Client.Services;
@@ -8,7 +9,7 @@ using pixit.Shared.Models.Events;
 
 namespace pixit.Client.Pages
 {
-    partial class Room
+    public partial class Room : IDisposable
     {
         [Parameter] public string RoomId { get; set; }
         
@@ -17,12 +18,13 @@ namespace pixit.Client.Pages
         [Inject] private Mediator Mediator { get; set; }
         
         private string Token { get; set; }
-        private RoomModel RoomInfo { get; set; }
+        private RoomInfoEvent RoomInfo { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            await Mediator.Register<RoomModel>(HandleRoomInfo);
-            await Mediator.Register<UserModel>(HandleUserJoined);
+            await Mediator.Register<RoomInfoEvent>(HandleRoomInfo);
+            await Mediator.Register<UserJoinedRoomEvent>(HandleUserJoined);
+            await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
             
             Token = await LocalStorage.GetItemAsync<string>("token");
             await Event.GetRoomInfo(new JoinRoomEvent()
@@ -32,18 +34,40 @@ namespace pixit.Client.Pages
             });
         }
 
-        protected Task HandleUserJoined(UserModel user)
+        protected Task HandleUserJoined(UserJoinedRoomEvent user)
         {
-            RoomInfo.Users.Add(user);
+            RoomInfo.Users.Add(new UserModel()
+            {
+                Name = user.Name,
+                Avatar = user.Avatar
+            });
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+        
+        protected Task HandleUserLeft(UserLeftRoomEvent user)
+        {
+            RoomInfo.Users.RemoveAll(u => u.Name == user.Username);
             StateHasChanged();
             return Task.CompletedTask;
         }
 
-        protected Task HandleRoomInfo(RoomModel RoomInfo)
+        protected Task HandleRoomInfo(RoomInfoEvent RoomInfo)
         {
             this.RoomInfo = RoomInfo;
             StateHasChanged();
             return Task.CompletedTask;
+        }
+        
+        public void Dispose()
+        {
+            Event.UserLeftRoom(new UserLeftRoomEvent()
+            {
+                Token = Token,
+                RoomId = RoomId
+            });
+            Mediator.Unregister<RoomInfoEvent>();
+            Mediator.Unregister<UserJoinedRoomEvent>();
         }
     }
 }

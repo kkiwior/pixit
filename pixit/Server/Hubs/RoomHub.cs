@@ -20,25 +20,34 @@ namespace pixit.Server.Hubs
         public override async Task OnConnectedAsync()
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Rooms");
-            await this.SendRooms();
+            await SendRooms();
         }
 
         public async Task SendRooms()
         {
-            await Clients.Caller.SendAsync("SendRooms", _rooms.GetRooms());
+            await Clients.Caller.SendAsync("SendRooms", await _rooms.GetRooms());
         }
 
         public async Task CreateRoom(CreateRoomModel roomData)
         {
             var room = await _rooms.Create(roomData);
             await Clients.Group("Rooms").SendAsync("SendRoom", room);
-            await JoinRoom(room.Key, room.Value.Users.First());
+            await JoinRoom(room.Key, roomData.User);
         }
 
         public async Task UserJoinRoom(JoinRoomEvent data)
         {
-            data.User.Token = await _rooms.JoinRoom(data.RoomId, data.User);
-            await JoinRoom(data.RoomId, data.User);
+            var res = await _rooms.JoinRoom(data.RoomId, data.User);
+            if(res != null) await JoinRoom(data.RoomId, data.User);
+        }
+        
+        public async Task UserLeftRoom(JoinRoomEvent data)
+        {
+            var username = await _rooms.LeaveRoom(data.RoomId, data.Token);
+            await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", new UserLeftRoomEvent()
+            {
+                Username = username
+            });
         }
 
         public async Task JoinRoom(string roomId, UserModel User)
@@ -50,13 +59,16 @@ namespace pixit.Server.Hubs
                 RoomId = roomId,
                 Token = User.Token
             });
-            await Clients.Group(roomId).SendAsync("UserJoinedRoom", User);
+            await Clients.Group(roomId).SendAsync("UserJoinedRoom", new UserJoinedRoomEvent()
+            {
+                Name = User.Name,
+                Avatar = User.Avatar
+            });
         }
 
         public async Task GetRoomInfo(JoinRoomEvent session)
         {
-            RoomModel room = await _rooms.GetInfo(session.RoomId, session.Token);
-            if(room != null) await Clients.Caller.SendAsync("RoomInfo", room);
+            await Clients.Caller.SendAsync("RoomInfo", await _rooms.GetInfo(session.RoomId, session.Token));
         }
     }
 }

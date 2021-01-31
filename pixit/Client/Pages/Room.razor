@@ -5,7 +5,7 @@
 @RoomId
 
 <div>
-@if (RoomInfo?.UsersOnline > 0)
+@if (RoomInfo?.Users?.Count > 0)
 {
     @foreach (UserModel user in RoomInfo?.Users)
     {
