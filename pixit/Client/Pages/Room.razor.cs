@@ -1,6 +1,8 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Mapster;
 using Microsoft.AspNetCore.Components;
 using pixit.Client.Services;
 using pixit.Client.Utils;
@@ -16,48 +18,42 @@ namespace pixit.Client.Pages
         [Inject] private ILocalStorageService LocalStorage { get; set; }
         [Inject] private SendEventService Event { get; set; }
         [Inject] private Mediator Mediator { get; set; }
+        [Inject] private NavigationManager Navigation { get; set; }
+        [Inject] private StateContainer State { get; set; }
         
         private string Token { get; set; }
-        private RoomInfoEvent RoomInfo { get; set; }
+        private RoomModel RoomInfo { get; set; }
+        private UserModel User { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            await Mediator.Register<RoomInfoEvent>(HandleRoomInfo);
+            User = await LocalStorage.GetItemAsync<UserModel>("user");
+            if (User == null) Navigation.NavigateTo("");
+            
+            Token = await LocalStorage.GetItemAsync<string>("token");
+            RoomInfo = State.Room;
+            StateHasChanged();
+            
             await Mediator.Register<UserJoinedRoomEvent>(HandleUserJoined);
             await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
             
-            Token = await LocalStorage.GetItemAsync<string>("token");
-            await Event.GetRoomInfo(new JoinRoomEvent()
-            {
-                RoomId = RoomId,
-                Token = Token
-            });
+
         }
 
         protected Task HandleUserJoined(UserJoinedRoomEvent user)
         {
-            RoomInfo.Users.Add(new UserModel()
-            {
-                Name = user.Name,
-                Avatar = user.Avatar
-            });
+            RoomInfo.Users.Add(user.Adapt<UserModel>());
             StateHasChanged();
             return Task.CompletedTask;
         }
         
         protected Task HandleUserLeft(UserLeftRoomEvent user)
         {
-            RoomInfo.Users.RemoveAll(u => u.Name == user.Username);
+            RoomInfo.Users.RemoveAll(u => u.Id == user.Id);
             StateHasChanged();
             return Task.CompletedTask;
         }
-
-        protected Task HandleRoomInfo(RoomInfoEvent RoomInfo)
-        {
-            this.RoomInfo = RoomInfo;
-            StateHasChanged();
-            return Task.CompletedTask;
-        }
+        
         
         public void Dispose()
         {
@@ -66,8 +62,8 @@ namespace pixit.Client.Pages
                 Token = Token,
                 RoomId = RoomId
             });
-            Mediator.Unregister<RoomInfoEvent>();
             Mediator.Unregister<UserJoinedRoomEvent>();
+            Mediator.Unregister<UserLeftRoomEvent>();
         }
     }
 }

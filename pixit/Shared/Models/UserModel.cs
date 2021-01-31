@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using pixit.Shared.Utils;
 
@@ -6,6 +7,7 @@ namespace pixit.Shared.Models
 {
     public class UserModel
     {
+        public string Id { get; set; }
         [Display(Name = "Nazwa użytkownika")]
         [Required(ErrorMessage = "{0} jest wymagana.")]
         [StringLength(32, ErrorMessage = "{0} musi zawierać od {2} do {1} znaków.", MinimumLength = 3)]
@@ -17,6 +19,10 @@ namespace pixit.Shared.Models
 
         [NestedObjectValidation]
         public AvatarModel Avatar { get; set; } = new();
-        
+
+        public UserModel()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
     }
 }
