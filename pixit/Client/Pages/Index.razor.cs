@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using pixit.Shared.Models;
 
 namespace pixit.Client.Pages
@@ -15,37 +12,28 @@ namespace pixit.Client.Pages
         [Inject] private ILocalStorageService LocalStorage { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
 
-        private Dictionary<string, string> Controls = new();
-        private UserModel User = new();
+        private UserModel _user = new();
 
         protected override async Task OnInitializedAsync()
-        {  
-            //lang support?
-
-            string username = await LocalStorage.GetItemAsync<string>("username");
-            if (!String.IsNullOrEmpty(username))
-            {
-                User.Name = username;
-                await Submit();
-            }
+        {
+            _user = await LocalStorage.GetItemAsync<UserModel>("user");
         }
 
         private async Task Submit()
         {
-            await LocalStorage.SetItemAsync<UserModel>("user", User);
+            await LocalStorage.SetItemAsync("user", _user);
             Navigation.NavigateTo("lobby");
         }
 
-        private void Increase(string prop) => setAvatarProperty(prop, 1);
-        private void Decrease(string prop) => setAvatarProperty(prop, -1);
+        private void Increase(string prop) => SetAvatarProperty(prop, 1);
+        private void Decrease(string prop) => SetAvatarProperty(prop, -1);
 
-        private void setAvatarProperty(string prop, short val)
+        private void SetAvatarProperty(string prop, short val)
         {
-            PropertyInfo property = User.Avatar.GetType().GetProperty(prop);
-            int value = (prop == "Gender" ? val : Convert.ToInt16(property.GetValue(User.Avatar)) + val);
-            property.SetValue(User.Avatar, value);
-            ValidationContext vc = new ValidationContext(User.Avatar);
-            Validator.TryValidateObject(User.Avatar, vc, null, true);
+            PropertyInfo property = _user.Avatar.GetType().GetProperty(prop);
+            int value = (prop == "Gender" ? val : Convert.ToInt16(property?.GetValue(_user.Avatar)) + val);
+            property?.SetValue(_user.Avatar, value);
+            _user.Validate();
         }
     }
 }

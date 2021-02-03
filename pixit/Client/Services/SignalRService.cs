@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
 using pixit.Shared.Models.Events;
@@ -17,6 +18,10 @@ namespace pixit.Client.Services
             _mediator = mediator;
             HubConnection = new HubConnectionBuilder()
                 .WithUrl(client.BaseAddress?.AbsoluteUri + "roomhub")
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.IgnoreNullValues = true;
+                })
                 .Build();
 
             HubConnection.StartAsync();

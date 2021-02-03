@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using Newtonsoft.Json;
 using pixit.Server.Hubs;
 using pixit.Server.Services;
 using StackExchange.Redis.Extensions.Core;
@@ -26,7 +27,10 @@ namespace pixit.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSignalR().AddNewtonsoftJsonProtocol();
+            services.AddSignalR().AddNewtonsoftJsonProtocol((options) =>
+            {
+                options.PayloadSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
             services.AddSingleton<ISerializer, NewtonsoftSerializer>();
             services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>((options) =>
             {

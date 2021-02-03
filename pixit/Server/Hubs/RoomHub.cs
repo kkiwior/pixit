@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using pixit.Server.Services;
 using pixit.Shared.Models;
@@ -21,20 +23,31 @@ namespace pixit.Server.Hubs
         
         public override async Task OnConnectedAsync()
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, "Rooms");
-            await SendRooms();
+
+        }
+
+        public override async Task OnDisconnectedAsync(Exception ex)
+        {
+            if (Context.Items.ContainsKey("room")) _rooms.LeaveRoom(Context.Items["room"].ToString(), Context.ConnectionId);
         }
 
         
-        public async Task SendRooms()
+        public async Task GetRooms()
         {
+            await Groups.AddToGroupAsync(Context.ConnectionId, "lobby");
             await Clients.Caller.SendAsync("SendRooms", await _rooms.GetRooms());
+        }
+
+        public async Task SendRoom(string roomId)
+        {
+            RoomModel room = await _rooms.Get(roomId);
+            await Clients.Group("lobby").SendAsync("SendRoom", new KeyValuePair<string, LobbyListEvent>(roomId, room.Adapt<LobbyListEvent>()));
         }
 
         
         public async Task CreateRoom(CreateRoomModel roomData)
         {
-            JoinRoomEvent jre = await _rooms.Create(roomData);
+            JoinRoomEvent jre = await _rooms.Create(roomData, Context.ConnectionId);
             await JoinRoom(jre.RoomId, jre.User);
         }
         
@@ -47,17 +60,22 @@ namespace pixit.Server.Hubs
         
         public async Task JoinRoom(string roomId, UserModel User)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "rooms");
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "lobby");
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-            await Clients.Group(roomId).SendAsync("UserJoinedRoom", User);
-            await Clients.Caller.SendAsync("JoinRoomEvent", await _rooms.JoinRoom(roomId, User));
+            await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("UserJoinedRoom", User);
+            await Clients.Caller.SendAsync("JoinRoomEvent", await _rooms.JoinRoom(roomId, User, Context.ConnectionId));
+            Context.Items.Add("room", roomId);
+            await SendRoom(roomId);
         }    
         
         
         public async Task UserLeftRoom(UserLeftRoomEvent data)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, data.RoomId);
-            await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", await _rooms.LeaveRoom(data.RoomId, data.Token));
+            await Groups.AddToGroupAsync(Context.ConnectionId, "lobby");
+            await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", await _rooms.LeaveRoom(Context.Items["room"].ToString(), Context.ConnectionId));
+            Context.Items.Remove("room");
+            await SendRoom(data.RoomId);
         }
     }
 }

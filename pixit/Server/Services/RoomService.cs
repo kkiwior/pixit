@@ -22,15 +22,13 @@ namespace pixit.Server.Services
             _hub = hub;
         }
 
-        public async Task<JoinRoomEvent> Create(CreateRoomModel roomData)
+        public async Task<JoinRoomEvent> Create(CreateRoomModel roomData, string connectionid)
         {
-            RoomModel room = roomData.Adapt<RoomModel>();
+            RoomModel room = new RoomModel(roomData.Name);
             UserModel user = roomData.User;
             string roomId = Guid.NewGuid().ToString();
-            user.Token = Guid.NewGuid().ToString();
-            room.Host = user.Token;
+            user.Token = connectionid;
             await _rooms.AddAsync(roomId, room);
-            await _hub.Clients.Group("Rooms").SendAsync("SendRoom", room);
             return new JoinRoomEvent()
             {
                 User = user,
@@ -49,6 +47,11 @@ namespace pixit.Server.Services
         {
             return await _rooms.GetAsync<RoomModel>(roomId);
         }
+
+        public async Task Remove(string roomId)
+        {
+            await _rooms.RemoveAsync(roomId);
+        }
         
 
         public async Task Save(string roomId, RoomModel room)
@@ -57,12 +60,12 @@ namespace pixit.Server.Services
         }
 
 
-        public async Task<JoinRoomEvent> JoinRoom(string roomId, UserModel User)
+        public async Task<JoinRoomEvent> JoinRoom(string roomId, UserModel User, string connectionid)
         {
             RoomModel room = await Get(roomId);
-            if (room == null || room.Slots <= room.UsersOnline) return null;
-            if (room.UsersOnline == 0) User.Token = room.Host;
-            else User.Token = Guid.NewGuid().ToString();
+            if (room == null || room.Settings.Slots <= room.UsersOnline) return null;
+            User.Token = connectionid;
+            if (room.UsersOnline == 0) room.Settings.Host = connectionid;
             room.Users.Add(User);
             await Save(roomId, room);
             JoinRoomEvent jre = room.Adapt<JoinRoomEvent>();
@@ -72,11 +75,16 @@ namespace pixit.Server.Services
         }
 
         
-        public async Task<UserLeftRoomEvent> LeaveRoom(string roomId, string token)
+        public async Task<UserLeftRoomEvent> LeaveRoom(string roomId, string connectionid)
         {
             RoomModel room = await Get(roomId);
-            var user = room.Users.Find(u => u.Token == token);
-            room.Users.RemoveAll(u => u.Token == token);
+            var user = room.Users.Find(u => u.Token == connectionid);
+            room.Users.RemoveAll(u => u.Token == connectionid);
+            if (room.UsersOnline == 0)
+            {
+                await Remove(roomId);
+                return null;
+            }
             await Save(roomId, room);
             return new UserLeftRoomEvent(user.Id);
         }

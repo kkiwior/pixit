@@ -24,5 +24,11 @@ namespace pixit.Shared.Models
         {
             Id = Guid.NewGuid().ToString();
         }
+
+        public void Validate()
+        {
+            ValidationContext vc = new ValidationContext(Avatar);
+            Validator.TryValidateObject(Avatar, vc, null, true);
+        }
     }
 }

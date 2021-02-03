@@ -25,7 +25,7 @@ namespace pixit.Client
             builder.Services.AddScoped<SignalRService>();
             builder.Services.AddScoped<SendEventService>();
             builder.Services.AddScoped<Mediator>();
-            builder.Services.AddScoped<StateContainer>();
+            builder.Services.AddSingleton<StateContainer>();
             builder.Services.AddBlazoredLocalStorage();
             builder.RootComponents.Add<App>("#app");
 

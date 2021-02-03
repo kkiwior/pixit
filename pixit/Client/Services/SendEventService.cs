@@ -13,9 +13,9 @@ namespace pixit.Client.Services
             _signalr = signalr;
         }
         
+        public async Task GetRooms() => await _signalr.HubConnection.SendAsync("GetRooms");
         public async Task CreateRoom(CreateRoomModel room) => await _signalr.HubConnection.SendAsync("CreateRoom", room);
         public async Task UserJoinRoom(JoinRoomEvent session) => await _signalr.HubConnection.SendAsync("UserJoinRoom", session);
         public async Task UserLeftRoom(UserLeftRoomEvent session) => await _signalr.HubConnection.SendAsync("UserLeftRoom", session);
-        public async Task GetRoomInfo(JoinRoomEvent session) => await _signalr.HubConnection.SendAsync("GetRoomInfo", session);
     }
 }
