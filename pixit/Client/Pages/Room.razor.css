@@ -1,0 +1,11 @@
+﻿.form-range {
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+}
+
+.roomName {
+    width: 100%;
+    background-color: var(--primary);
+    border-bottom: 1px solid #676767;
+    font-size: 18px;
+}

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Mapster;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
@@ -22,9 +20,6 @@ namespace pixit.Client.Pages
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
         
-        
-        [Inject] private IJSRuntime JSRuntime { get; set; }
-
         private string Token { get; set; }
         private RoomModel RoomInfo { get; set; }
         private UserModel User { get; set; }
@@ -64,22 +59,15 @@ namespace pixit.Client.Pages
             return Task.CompletedTask;
         }
 
-        protected async Task updateSlots(ChangeEventArgs e)
+        protected async Task UpdateSettings()
         {
-            RoomInfo.Settings.Slots = Convert.ToInt16(e.Value);
-            await JSRuntime.InvokeVoidAsync("console.log", e);
-            await Event.UpdateSettings(RoomInfo.Settings);
-        }
-        
-        protected async Task updateScore(ChangeEventArgs e)
-        {
-            RoomInfo.Settings.MaxScore = Convert.ToInt16(e.Value);
-            await Event.UpdateSettings(RoomInfo.Settings);
+            if(RoomInfo.Settings.Slots > RoomInfo.Users.Count && RoomInfo.Settings.Slots <= 20 && RoomInfo.Settings.MaxScore >= 5 && RoomInfo.Settings.MaxScore <= 100)
+                await Event.UpdateSettings(RoomInfo.Settings);
         }
 
         public void Dispose()
         {
-            Event.UserLeftRoom(new UserLeftRoomEvent()
+            Event.UserLeftRoom(new UserLeftRoomEvent
             {
                 Token = Token,
                 RoomId = RoomId

@@ -45,8 +45,7 @@ namespace pixit.Server.Services
         
         public async Task<RoomModel> Get(string roomId)
         {
-            var room = await _rooms.GetAsync<RoomModel>(roomId);
-            return room;
+            return await _rooms.GetAsync<RoomModel>(roomId);
         }
 
         public async Task Remove(string roomId)
@@ -92,10 +91,11 @@ namespace pixit.Server.Services
             return new UserLeftRoomEvent(user.Id);
         }
 
-        public async Task Update(string roomId, SettingsModel settings, string connectionid)
+        public async Task UpdateSettings(string roomId, SettingsModel settings, string connectionid)
         {
             RoomModel room = await Get(roomId);
             if (room.Settings.Host != connectionid) return;
+            settings.Host = room.Settings.Host;
             room.Settings = settings;
             await Save(roomId, room);
             await _hub.Clients.Group(roomId).SendAsync("UpdateRoomSettings", room.Settings);

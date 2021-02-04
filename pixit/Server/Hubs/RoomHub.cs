@@ -70,8 +70,10 @@ namespace pixit.Server.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "lobby");
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
             User.Id = Guid.NewGuid().ToString();
+            JoinRoomEvent jre = await _rooms.JoinRoom(roomId, User, Context.ConnectionId);
+            if (jre == null) return;
+            await Clients.Caller.SendAsync("JoinRoomEvent", jre);
             await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("UserJoinedRoom", User);
-            await Clients.Caller.SendAsync("JoinRoomEvent", await _rooms.JoinRoom(roomId, User, Context.ConnectionId));
             Context.Items.Add("room", roomId);
             await SendRoom(roomId);
         }    
@@ -88,7 +90,7 @@ namespace pixit.Server.Hubs
 
         public async Task UpdateSettings(SettingsModel settings)
         {
-            await _rooms.Update(Context.Items["room"].ToString(), settings, Context.ConnectionId);
+            await _rooms.UpdateSettings(Context.Items["room"].ToString(), settings, Context.ConnectionId);
             await SendRoom(Context.Items["room"].ToString());
         }
     }
