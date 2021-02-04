@@ -8,6 +8,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using pixit.Server.Hubs;
 using pixit.Server.Services;
+using pixit.Server.Utils;
 using StackExchange.Redis.Extensions.Core;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
@@ -32,6 +33,10 @@ namespace pixit.Server
                 options.PayloadSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
             services.AddSingleton<ISerializer, NewtonsoftSerializer>();
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                ContractResolver = new RedisContractResolver()
+            };
             services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>((options) =>
             {
                 return Configuration.GetSection("Redis").Get<RedisConfiguration>();

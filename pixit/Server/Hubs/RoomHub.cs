@@ -23,7 +23,7 @@ namespace pixit.Server.Hubs
         
         public override async Task OnConnectedAsync()
         {
-            Console.WriteLine(Context.ConnectionId);
+
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)

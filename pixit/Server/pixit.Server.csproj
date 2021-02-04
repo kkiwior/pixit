@@ -19,9 +19,5 @@
     <ProjectReference Include="..\Shared\pixit.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Utils" />
-  </ItemGroup>
-
 
 </Project>
