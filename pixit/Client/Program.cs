@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Mapster;
 using Microsoft.AspNetCore.Components;
 using pixit.Client.Services;
 using pixit.Client.Shared;
@@ -32,7 +33,8 @@ namespace pixit.Client
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             //CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
-            
+            TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
+
 
             await builder.Build().RunAsync();
         }

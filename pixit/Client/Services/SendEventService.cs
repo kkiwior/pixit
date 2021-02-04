@@ -17,5 +17,6 @@ namespace pixit.Client.Services
         public async Task CreateRoom(CreateRoomModel room) => await _signalr.HubConnection.SendAsync("CreateRoom", room);
         public async Task UserJoinRoom(JoinRoomEvent session) => await _signalr.HubConnection.SendAsync("UserJoinRoom", session);
         public async Task UserLeftRoom(UserLeftRoomEvent session) => await _signalr.HubConnection.SendAsync("UserLeftRoom", session);
+        public async Task UpdateSettings(SettingsModel settings) => await _signalr.HubConnection.SendAsync("UpdateSettings", settings);
     }
 }

@@ -1,15 +1,33 @@
 ﻿@page "/room/{RoomId}"
 @using pixit.Shared.Models
 
-<h3>Room</h3>
-@RoomId
-
-<div>
 @if (RoomInfo?.Users?.Count > 0)
 {
-    @foreach (UserModel user in RoomInfo?.Users)
-    {
-        <Avatar Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="150"/>
-    } 
-}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 text-center">@RoomInfo.Name</div>
+        <div class="col-6 text-center">
+            <div class="d-flex">
+
+                @foreach (UserModel user in RoomInfo?.Users)
+                {
+                    <div style="margin-right: 12px; width: 150px; text-align:  center; word-wrap: break-word;">
+                        <Avatar Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="150"/>
+                        <div>@user.Name</div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-6 text-center">
+            <div class="form-group">
+                <label for="slots" class="form-label">Liczba graczy: @RoomInfo.Settings.Slots</label>
+                <input type="range" min="2" max="20" class="form-range" id="slots" style="width: 100%;" value="@RoomInfo.Settings.Slots" @oninput="updateSlots" disabled="@(RoomInfo.isHost ? false : true)">
+            </div>
+            <div class="form-group">
+                <label for="score" class="form-label">Liczba punktów: @RoomInfo.Settings.MaxScore</label>
+                <input type="range" min="5" max="100" class="form-range" id="score" style="width: 100%;" value="@RoomInfo.Settings.MaxScore" @oninput="updateScore" disabled="@(RoomInfo.isHost ? false : true)">
+            </div>
+        </div>
+    </div>
 </div>
+}

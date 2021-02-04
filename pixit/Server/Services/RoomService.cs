@@ -68,7 +68,10 @@ namespace pixit.Server.Services
             if (room.UsersOnline == 0) room.Settings.Host = connectionid;
             room.Users.Add(User);
             await Save(roomId, room);
+            Console.WriteLine(User.Token);
+            Console.WriteLine(User.Id);
             JoinRoomEvent jre = room.Adapt<JoinRoomEvent>();
+            jre.isHost = (room.UsersOnline == 1 ? true : false);
             jre.Token = User.Token;
             jre.RoomId = roomId;
             return jre;
@@ -85,8 +88,20 @@ namespace pixit.Server.Services
                 await Remove(roomId);
                 return null;
             }
+
+            Console.WriteLine(user.Token);
+            Console.WriteLine(user.Id);
             await Save(roomId, room);
             return new UserLeftRoomEvent(user.Id);
+        }
+
+        public async Task Update(string roomId, SettingsModel settings, string connectionid)
+        {
+            RoomModel room = await Get(roomId);
+            if (room.Settings.Host != connectionid) return;
+            room.Settings = settings;
+            await Save(roomId, room);
+            await _hub.Clients.Group(roomId).SendAsync("UpdateRoomSettings", room.Settings);
         }
     }
 }

@@ -23,12 +23,19 @@ namespace pixit.Server.Hubs
         
         public override async Task OnConnectedAsync()
         {
-
+            Console.WriteLine(Context.ConnectionId);
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            if (Context.Items.ContainsKey("room")) _rooms.LeaveRoom(Context.Items["room"].ToString(), Context.ConnectionId);
+            if (Context.Items.ContainsKey("room"))
+            {
+                UserLeftRoom(new UserLeftRoomEvent()
+                {
+                    RoomId = Context.Items["room"].ToString(),
+                    Token = Context.ConnectionId
+                });
+            }
         }
 
         
@@ -62,6 +69,7 @@ namespace pixit.Server.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "lobby");
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+            User.Id = Guid.NewGuid().ToString();
             await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("UserJoinedRoom", User);
             await Clients.Caller.SendAsync("JoinRoomEvent", await _rooms.JoinRoom(roomId, User, Context.ConnectionId));
             Context.Items.Add("room", roomId);
@@ -76,6 +84,12 @@ namespace pixit.Server.Hubs
             await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", await _rooms.LeaveRoom(Context.Items["room"].ToString(), Context.ConnectionId));
             Context.Items.Remove("room");
             await SendRoom(data.RoomId);
+        }
+
+        public async Task UpdateSettings(SettingsModel settings)
+        {
+            await _rooms.Update(Context.Items["room"].ToString(), settings, Context.ConnectionId);
+            await SendRoom(Context.Items["room"].ToString());
         }
     }
 }

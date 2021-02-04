@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using pixit.Shared.Utils;
 
 namespace pixit.Shared.Models
@@ -19,11 +19,6 @@ namespace pixit.Shared.Models
 
         [NestedObjectValidation]
         public AvatarModel Avatar { get; set; } = new();
-
-        public UserModel()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
 
         public void Validate()
         {

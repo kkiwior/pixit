@@ -35,6 +35,7 @@ namespace pixit.Client.Services
             HubConnection.On<JoinRoomEvent>("JoinRoomEvent", rooms => _mediator.Notify(rooms));
             HubConnection.On<UserJoinedRoomEvent>("UserJoinedRoom", rooms => _mediator.Notify(rooms));
             HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", rooms => _mediator.Notify(rooms));
+            HubConnection.On<SettingsModel>("UpdateRoomSettings", rooms => _mediator.Notify(rooms));
         }
     }
 }

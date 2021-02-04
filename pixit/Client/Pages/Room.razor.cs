@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Mapster;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
@@ -21,6 +22,9 @@ namespace pixit.Client.Pages
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
         
+        
+        [Inject] private IJSRuntime JSRuntime { get; set; }
+
         private string Token { get; set; }
         private RoomModel RoomInfo { get; set; }
         private UserModel User { get; set; }
@@ -36,8 +40,14 @@ namespace pixit.Client.Pages
             
             await Mediator.Register<UserJoinedRoomEvent>(HandleUserJoined);
             await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
-            
+            await Mediator.Register<SettingsModel>(HandleSettingsUpdate);
+        }
 
+        private Task HandleSettingsUpdate(SettingsModel settings)
+        {
+            RoomInfo.Settings = settings;
+            StateHasChanged();
+            return Task.CompletedTask;
         }
 
         protected Task HandleUserJoined(UserJoinedRoomEvent user)
@@ -49,12 +59,24 @@ namespace pixit.Client.Pages
         
         protected Task HandleUserLeft(UserLeftRoomEvent user)
         {
-            RoomInfo.Users.RemoveAll(u => u.Id == user.Id);
+            RoomInfo.Users.RemoveAll(u=>u.Id == user.Id);
             StateHasChanged();
             return Task.CompletedTask;
         }
+
+        protected async Task updateSlots(ChangeEventArgs e)
+        {
+            RoomInfo.Settings.Slots = Convert.ToInt16(e.Value);
+            await JSRuntime.InvokeVoidAsync("console.log", e);
+            await Event.UpdateSettings(RoomInfo.Settings);
+        }
         
-        
+        protected async Task updateScore(ChangeEventArgs e)
+        {
+            RoomInfo.Settings.MaxScore = Convert.ToInt16(e.Value);
+            await Event.UpdateSettings(RoomInfo.Settings);
+        }
+
         public void Dispose()
         {
             Event.UserLeftRoom(new UserLeftRoomEvent()

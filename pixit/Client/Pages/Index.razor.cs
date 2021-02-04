@@ -16,7 +16,7 @@ namespace pixit.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            _user = await LocalStorage.GetItemAsync<UserModel>("user");
+            _user = await LocalStorage.GetItemAsync<UserModel>("user") ?? new UserModel();
         }
 
         private async Task Submit()

@@ -46,15 +46,19 @@ namespace pixit.Client.Pages
             try
             {
                 await LocalStorage.SetItemAsync("token", room.Token);
-                State.Room = room.Adapt<RoomModel>();
+                State.Room = new RoomModel(room.Name)
+                {
+                    Settings = room.Settings,
+                    Users = room.Users,
+                    Started = room.Started,
+                    isHost = room.isHost
+                };
                 Navigation.NavigateTo("/room/" + room.RoomId);
             }
             catch (Exception ex)
             {
                 await JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-
             }
-
         }
 
         

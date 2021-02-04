@@ -8,7 +8,7 @@ namespace pixit.Shared.Models.Events
         public string RoomId { get; set; }
         public string Token { get; set; }
         
-        
+        public bool isHost { get; set; }
         
         public string Name { get; set; }
         public SettingsModel Settings { get; set; }
