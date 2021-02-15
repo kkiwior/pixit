@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using pixit.Client.Utils;
 using pixit.Shared.Models;
 
 namespace pixit.Client.Pages
@@ -11,6 +12,7 @@ namespace pixit.Client.Pages
     {
         [Inject] private ILocalStorageService LocalStorage { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
+        [Inject] private StateContainer State { get; set; }
 
         private UserModel _user = new();
 
@@ -22,6 +24,12 @@ namespace pixit.Client.Pages
         private async Task Submit()
         {
             await LocalStorage.SetItemAsync("user", _user);
+            if (State.JoinRoomAfterLogin != null)
+            {
+                Navigation.NavigateTo("room/" + State.JoinRoomAfterLogin);
+                State.JoinRoomAfterLogin = null;
+                return;
+            }
             Navigation.NavigateTo("lobby");
         }
 

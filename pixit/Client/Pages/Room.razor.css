@@ -9,3 +9,34 @@
     border-bottom: 1px solid #676767;
     font-size: 18px;
 }
+
+.controls {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+    opacity: 0;
+    align-items: center;
+}
+
+.controls:hover {
+    opacity: 0.7;
+    background-color: rgba(57, 57, 57, 0.7);
+}
+
+.controls button {
+    display: inline-block;
+    width: 16px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.controls button:before {
+    color: black;
+}

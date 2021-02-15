@@ -19,18 +19,17 @@ namespace pixit.Server.Services
         {
             _rooms = redisCache.GetDbFromConfiguration();
             _hub = hub;
+            _rooms.FlushDbAsync();
         }
 
-        public async Task<JoinRoomEvent> Create(CreateRoomModel roomData, string connectionid)
+        public async Task<CreateRoomEvent> Create(CreateRoomEvent roomData)
         {
             RoomModel room = new RoomModel(roomData.Name);
-            UserModel user = roomData.User;
             string roomId = Guid.NewGuid().ToString();
             await _rooms.AddAsync(roomId, room);
-            return new JoinRoomEvent()
+            return new CreateRoomEvent()
             {
-                User = user,
-                RoomId = roomId
+                Id = roomId
             };
         }
 
@@ -107,6 +106,14 @@ namespace pixit.Server.Services
             room.Settings = settings;
             await Save(roomId, room);
             await _hub.Clients.Group(roomId).SendAsync("UpdateRoomSettings", room.Settings);
+        }
+        
+        
+        public async Task<string> KickUser(string roomId, KickUserEvent user, string connectionid)
+        {
+            RoomModel room = await Get(roomId);
+            if (room.Settings.HostToken != connectionid) return null;
+            return room.Users.Find(e => e.Id == user.UserId)?.Token;
         }
     }
 }

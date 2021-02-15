@@ -29,7 +29,19 @@ namespace pixit.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             User = await LocalStorage.GetItemAsync<UserModel>("user");
-            if (User == null) Navigation.NavigateTo("");
+            if (User == null)
+            {
+                State.JoinRoomAfterLogin = RoomId;
+                Navigation.NavigateTo("");
+                return;
+            }
+            User.Validate();
+            
+            await Event.UserJoinRoom(new JoinRoomEvent()
+            {
+                RoomId = RoomId,
+                User = User
+            });
 
             RoomInfo = State?.Room;
             StateHasChanged();
@@ -39,10 +51,22 @@ namespace pixit.Client.Pages
             await Mediator.Register<UserJoinedRoomEvent>(HandleUserJoined);
             await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
             await Mediator.Register<SettingsModel>(HandleSettingsUpdate);
+            await Mediator.Register<KickUserEvent>(HandleKick);
         }
-        
+
+        private Task HandleKick(KickUserEvent arg)
+        {
+            Navigation.NavigateTo("lobby");
+            return Task.CompletedTask;
+        }
+
         protected async Task HandleJoinRoom(JoinRoomEvent jre)
         {
+            if (jre.Started)
+            {
+                Navigation.NavigateTo("lobby");
+                return;
+            }
             await LocalStorage.SetItemAsync("token", jre.Token);
             Token = jre.Token;
             RoomInfo = new RoomModel(jre.Name)
@@ -86,19 +110,35 @@ namespace pixit.Client.Pages
 
         protected async Task UpdateSettings()
         {
-            if(RoomInfo.Settings.Slots > RoomInfo.Users.Count && RoomInfo.Settings.Slots <= 20 && RoomInfo.Settings.MaxScore >= 5 && RoomInfo.Settings.MaxScore <= 100)
+            if(RoomInfo.Settings.Slots >= RoomInfo.Users.Count && RoomInfo.Settings.Slots <= 20 && RoomInfo.Settings.MaxScore >= 5 && RoomInfo.Settings.MaxScore <= 100)
                 await Event.UpdateSettings(RoomInfo.Settings);
         }
 
         public void Dispose()
         {
-            Event.UserLeftRoom(new UserLeftRoomEvent
+            if (RoomInfo?.Name != null)
             {
-                Token = Token,
-                RoomId = RoomId
-            });
+                Event.UserLeftRoom(new UserLeftRoomEvent
+                {
+                    Token = Token,
+                    RoomId = RoomId
+                });               
+            }
+            Mediator.Unregister<JoinRoomEvent>();
+            Mediator.Unregister<SetRoomHostEvent>();
             Mediator.Unregister<UserJoinedRoomEvent>();
             Mediator.Unregister<UserLeftRoomEvent>();
+            Mediator.Unregister<SettingsModel>();
+            Mediator.Unregister<KickUserEvent>();
+        }
+
+        private void KickUser(string userId)
+        {
+            if (userId == State.UserId) return;
+            Event.KickUser(new KickUserEvent()
+            {
+                UserId = userId
+            });
         }
     }
 }

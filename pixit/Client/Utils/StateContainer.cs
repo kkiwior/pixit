@@ -6,5 +6,6 @@ namespace pixit.Client.Utils
     {
         public RoomModel Room { get; set; }
         public string UserId { get; set; }
+        public string JoinRoomAfterLogin { get; set; }
     }
 }

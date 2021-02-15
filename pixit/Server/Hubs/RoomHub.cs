@@ -50,11 +50,9 @@ namespace pixit.Server.Hubs
         }
 
         
-        public async Task CreateRoom(CreateRoomModel roomData)
+        public async Task CreateRoom(CreateRoomEvent roomData)
         {
-            JoinRoomEvent jre = await _rooms.Create(roomData, Context.ConnectionId);
-            await JoinRoom(jre.RoomId, jre.User);
-            await _rooms.SetRoomHost(jre.RoomId);
+            await Clients.Caller.SendAsync("CreateRoom", await _rooms.Create(roomData));
         }
         
 
@@ -76,14 +74,22 @@ namespace pixit.Server.Hubs
         
         public async Task JoinRoom(string roomId, UserModel user)
         {
+            JoinRoomEvent jre = await _rooms.JoinRoom(roomId, user, Context.ConnectionId);
+            if (jre == null)
+            {
+                await Clients.Caller.SendAsync("JoinRoomEvent", new JoinRoomEvent()
+                {
+                    Started = true
+                });
+                return;
+            }
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "lobby");
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-            JoinRoomEvent jre = await _rooms.JoinRoom(roomId, user, Context.ConnectionId);
-            if (jre == null) return;
             await Clients.Caller.SendAsync("JoinRoomEvent", jre);
             await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("UserJoinedRoom", user);
             Context.Items.Add("room", roomId);
             await SendRoom(roomId);
+            if (jre.Users.Count == 1) await _rooms.SetRoomHost(roomId);
         }    
         
 
@@ -91,6 +97,13 @@ namespace pixit.Server.Hubs
         {
             await _rooms.UpdateSettings(Context.Items["room"]?.ToString(), settings, Context.ConnectionId);
             await SendRoom(Context.Items["room"]?.ToString());
+        }
+
+
+        public async Task KickUser(KickUserEvent user)
+        {
+            string connectionId = await _rooms.KickUser(Context.Items["room"]?.ToString(), user, Context.ConnectionId);
+            await Clients.Client(connectionId).SendAsync("KickUser", user);
         }
     }
 }

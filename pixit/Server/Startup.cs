@@ -10,6 +10,7 @@ using pixit.Server.Hubs;
 using pixit.Server.Services;
 using pixit.Server.Utils;
 using StackExchange.Redis.Extensions.Core;
+using StackExchange.Redis.Extensions.Core.Abstractions;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
 

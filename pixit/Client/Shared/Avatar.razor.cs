@@ -17,6 +17,8 @@ namespace pixit.Client.Shared
         [Parameter] public int Hair { get; set; }
         [Parameter] public int Mouth { get; set; }
         [Parameter] public int Eye { get; set; }
+        [Parameter] public RenderFragment Controls { get; set; }
+
 
         public string GetBackground()
         {

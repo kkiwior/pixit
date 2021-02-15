@@ -37,6 +37,10 @@ namespace pixit.Client.Services
             HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", args => _mediator.Notify(args));
             HubConnection.On<SettingsModel>("UpdateRoomSettings", args => _mediator.Notify(args));
             HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _mediator.Notify(args));
+            HubConnection.On<CreateRoomEvent>("CreateRoom", args => _mediator.Notify(args));
+            HubConnection.On<KickUserEvent>("KickUser", args => _mediator.Notify(args));
+            
+            
         }
     }
 }

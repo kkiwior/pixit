@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
-using Mapster;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Shared;
 using pixit.Client.Utils;
@@ -27,7 +25,7 @@ namespace pixit.Client.Pages
         private Modal _modal = new();
         private UserModel _user;
 
-        private CreateRoomModel CreateRoomForm = new();
+        private CreateRoomEvent CreateRoomForm = new();
         Dictionary<string, LobbyListEvent> _roomList = new();
         
         protected override async Task OnInitializedAsync()
@@ -36,21 +34,13 @@ namespace pixit.Client.Pages
 
             await Mediator.Register<Dictionary<string, LobbyListEvent>>(HandleGetRooms);
             await Mediator.Register<KeyValuePair<string, LobbyListEvent>>(HandleGetRoom);
-            await Mediator.Register<JoinRoomEvent>(HandleRoomCreate);
+            await Mediator.Register<CreateRoomEvent>(HandleCreateRoom);
             await Event.GetRooms();
         }
 
-        private Task HandleRoomCreate(JoinRoomEvent jre)
+        private Task HandleCreateRoom(CreateRoomEvent e)
         {
-            State.UserId = jre.UserId;
-            State.Room = new RoomModel(jre.Name)
-            {
-                Settings = jre.Settings,
-                Users = jre.Users,
-                Started = jre.Started,
-                HostId = jre.UserId
-            };
-            Navigation.NavigateTo("/room/" + jre.RoomId);
+            Navigation.NavigateTo("/room/" + e.Id);
             return Task.CompletedTask;
         }
 
@@ -58,12 +48,7 @@ namespace pixit.Client.Pages
         {
             Validator.TryValidateObject(_user, new ValidationContext(_user), null, true);
             await LocalStorage.SetItemAsync("user", _user);
-
-            await Event.UserJoinRoom(new JoinRoomEvent()
-            {
-                RoomId = id,
-                User = _user
-            });
+            
             Navigation.NavigateTo("/room/" + id);
         }
 
@@ -71,6 +56,7 @@ namespace pixit.Client.Pages
         {
             Mediator.Unregister<Dictionary<string, LobbyListEvent>>();
             Mediator.Unregister<KeyValuePair<string, LobbyListEvent>>();
+            Mediator.Unregister<CreateRoomEvent>();
         }
 
         protected Task HandleGetRooms(Dictionary<string, LobbyListEvent> rooms)

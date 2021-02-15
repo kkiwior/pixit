@@ -1,4 +1,13 @@
-﻿html, body {
+﻿@font-face {
+    font-family: 'icons';
+    src: url('../images/utils/icons.eot');
+    src: url('../images/utils/icons.eot?#iefix') format('embedded-opentype'),
+    url('../images/utils/icons.woff') format('woff'),
+    url('../images/utils/icons.ttf') format('truetype'),
+    url('../images/utils/icons.svg#icons') format('svg');
+}
+
+html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: #e2e2e2;
     padding: 0;
@@ -12,6 +21,21 @@
     --secondary: #4e688e;
     --error: #ad232a;
 }
+
+[class*='icon-']:before{
+    font-family: 'icons' !important;
+    font-style: normal;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    color: var(--secondary);
+}
+.icon-left-arrow:before{content:'\0041';}
+.icon-right-arrow:before{content:'\0042';}
+.icon-male:before{content:'\0043'; color: #193664 !important;}
+.icon-female:before{content:'\0044'; color: #884c84 !important;}
+.icon-kick:before{content:'\0045';}
 
 .background {
     background-color: #2b2e33;

@@ -9,4 +9,8 @@
     <div class="avatar avatar_hair" style="background-position: @GetPositionOneCol(Hair)"></div>
     <div class="avatar avatar_mouth" style="background-position: @GetPositionOneCol(Mouth)"></div>
     <div class="avatar avatar_eye" style="background-position: @GetEye()"></div>
+    @if (Controls != null)
+    {
+        @Controls
+    }
 </div>

@@ -11,8 +11,17 @@
 
                 @foreach (UserModel user in RoomInfo?.Users)
                 {
-                    <div style="margin-right: 12px; width: 150px; text-align:  center; word-wrap: break-word;">
-                        <Avatar IsHost="@(RoomInfo.HostId == user.Id)" Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="150"/>
+                    <div style="margin-right: 12px; width: 150px; text-align: center; word-wrap: break-word;">
+                        <Avatar IsHost="@(RoomInfo.HostId == user.Id)" Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="150">
+                            <Controls>
+                                @if (State.UserId == RoomInfo.HostId)
+                                {
+                                    <div class="controls">
+                                        <button type="button" class="icon-kick" @onclick="@(() => KickUser(user.Id))"></button>
+                                    </div>
+                                }
+                            </Controls>
+                        </Avatar>
                         <div>@user.Name</div>
                     </div>
                 }
