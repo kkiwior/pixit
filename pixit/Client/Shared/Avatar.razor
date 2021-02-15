@@ -1,8 +1,12 @@
 ﻿<div class="avatar_container" style="--size:@Size;--sizepx:@(Size + "px")">
-    <div class="avatar avatar_background" style="background-position: @getBackground()"></div>
-    <div class="avatar avatar_face" style="background-position: @getPositionOneCol(Face)"></div>
-    <div class="avatar avatar_cloth" style="background-position: @getCloth()"></div>
-    <div class="avatar avatar_hair" style="background-position: @getPositionOneCol(Hair)"></div>
-    <div class="avatar avatar_mouth" style="background-position: @getPositionOneCol(Mouth)"></div>
-    <div class="avatar avatar_eye" style="background-position: @getEye()"></div>
+    @if (IsHost)
+    {
+        <div class="crown"></div>
+    }
+    <div class="avatar avatar_background" style="background-position: @GetBackground()"></div>
+    <div class="avatar avatar_face" style="background-position: @GetPositionOneCol(Face)"></div>
+    <div class="avatar avatar_cloth" style="background-position: @GetCloth()"></div>
+    <div class="avatar avatar_hair" style="background-position: @GetPositionOneCol(Hair)"></div>
+    <div class="avatar avatar_mouth" style="background-position: @GetPositionOneCol(Mouth)"></div>
+    <div class="avatar avatar_eye" style="background-position: @GetEye()"></div>
 </div>

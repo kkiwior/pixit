@@ -51,3 +51,15 @@
     height: calc(var(--sizepx) * 0.6);
     z-index: 4;
 }
+
+.crown {
+    z-index: 333;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: rotate(45deg);
+    height: 30px;
+    width: 35px;
+    background-image: url('images/utils/crown.svg');
+    background-size: contain;
+}

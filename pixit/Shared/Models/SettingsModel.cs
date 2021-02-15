@@ -15,7 +15,7 @@ namespace pixit.Shared.Models
         public int CardsCount { get; set; }
         
         [JsonIgnore]
-        public string Host { get; set; }
+        public string HostToken { get; set; }
 
         public SettingsModel()
         {

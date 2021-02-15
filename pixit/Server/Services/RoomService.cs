@@ -12,7 +12,6 @@ namespace pixit.Server.Services
 {
     public class RoomService
     {
-        //private readonly ConcurrentDictionary<string, RoomModel> _rooms = new();
         private readonly IRedisDatabase _rooms;
         private readonly IHubContext<RoomHub> _hub;
 
@@ -27,7 +26,6 @@ namespace pixit.Server.Services
             RoomModel room = new RoomModel(roomData.Name);
             UserModel user = roomData.User;
             string roomId = Guid.NewGuid().ToString();
-            user.Token = connectionid;
             await _rooms.AddAsync(roomId, room);
             return new JoinRoomEvent()
             {
@@ -60,21 +58,21 @@ namespace pixit.Server.Services
         }
 
 
-        public async Task<JoinRoomEvent> JoinRoom(string roomId, UserModel User, string connectionid)
+        public async Task<JoinRoomEvent> JoinRoom(string roomId, UserModel user, string connectionid)
         {
             RoomModel room = await Get(roomId);
             if (room == null || room.Settings.Slots <= room.UsersOnline) return null;
-            User.Token = connectionid;
-            if (room.UsersOnline == 0) room.Settings.Host = connectionid;
-            room.Users.Add(User);
+            user.Token = connectionid;
+            user.Id = Guid.NewGuid().ToString();
+            room.Users.Add(user);
             await Save(roomId, room);
             JoinRoomEvent jre = room.Adapt<JoinRoomEvent>();
-            jre.isHost = (room.UsersOnline == 1 ? true : false);
-            jre.Token = User.Token;
+            jre.Token = user.Token;
             jre.RoomId = roomId;
+            jre.UserId = user.Id;
             return jre;
         }
-
+        
         
         public async Task<UserLeftRoomEvent> LeaveRoom(string roomId, string connectionid)
         {
@@ -88,14 +86,24 @@ namespace pixit.Server.Services
             }
             
             await Save(roomId, room);
-            return new UserLeftRoomEvent(user.Id);
+            if (room.Settings.HostToken == user?.Token) await SetRoomHost(roomId);
+            return new UserLeftRoomEvent(user?.Id);
+        }
+
+        public async Task SetRoomHost(string roomId)
+        {
+            RoomModel room = await Get(roomId);
+            room.HostId = room.Users[0]?.Id;
+            room.Settings.HostToken = room.Users[0]?.Token;
+            await Save(roomId, room);
+            await _hub.Clients.Group(roomId).SendAsync("SetRoomHost", new SetRoomHostEvent(room.HostId));
         }
 
         public async Task UpdateSettings(string roomId, SettingsModel settings, string connectionid)
         {
             RoomModel room = await Get(roomId);
-            if (room.Settings.Host != connectionid) return;
-            settings.Host = room.Settings.Host;
+            if (room.Settings.HostToken != connectionid) return;
+            settings.HostToken = room.Settings.HostToken;
             room.Settings = settings;
             await Save(roomId, room);
             await _hub.Clients.Group(roomId).SendAsync("UpdateRoomSettings", room.Settings);

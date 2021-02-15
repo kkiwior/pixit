@@ -7,12 +7,12 @@ namespace pixit.Shared.Models.Events
         public UserModel User { get; set; }
         public string RoomId { get; set; }
         public string Token { get; set; }
-        
-        public bool isHost { get; set; }
-        
+        public string UserId { get; set; }
+
         public string Name { get; set; }
         public SettingsModel Settings { get; set; }
         public List<UserModel> Users { get; set; } = new();
+        public string HostId { get; set; }
         public bool Started { get; set; }
 
         public JoinRoomEvent()

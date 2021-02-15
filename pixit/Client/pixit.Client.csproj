@@ -22,7 +22,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\css\bootstrap" />
     <Folder Include="wwwroot\images\avatar" />
-    <Folder Include="wwwroot\images\utils" />
   </ItemGroup>
 
 </Project>

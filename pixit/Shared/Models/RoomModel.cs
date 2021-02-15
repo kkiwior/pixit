@@ -18,13 +18,12 @@ namespace pixit.Shared.Models
         
         public bool Started { get; set; }
 
-        public bool isHost { get; set; }
+        public string HostId { get; set; }
 
         public RoomModel(string name)
         {
             Name = name;
             Settings = new();
-            isHost = false;
         }
     }
 }

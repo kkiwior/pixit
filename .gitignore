@@ -353,3 +353,4 @@ MigrationBackup/
 .ionide/
 /pixit/Client/wwwroot/images/*
 /.idea/
+/.idea/.idea.pixit/.idea/

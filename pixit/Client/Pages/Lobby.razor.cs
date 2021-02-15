@@ -22,7 +22,7 @@ namespace pixit.Client.Pages
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
         
-        [Inject] private IJSRuntime JSRuntime { get; set; }
+        //[Inject] private IJSRuntime JSRuntime { get; set; }
 
         private Modal _modal = new();
         private UserModel _user;
@@ -36,32 +36,24 @@ namespace pixit.Client.Pages
 
             await Mediator.Register<Dictionary<string, LobbyListEvent>>(HandleGetRooms);
             await Mediator.Register<KeyValuePair<string, LobbyListEvent>>(HandleGetRoom);
-            await Mediator.Register<JoinRoomEvent>(HandleJoinRoom);
-
+            await Mediator.Register<JoinRoomEvent>(HandleRoomCreate);
             await Event.GetRooms();
         }
-        
-        protected async Task HandleJoinRoom(JoinRoomEvent room)
+
+        private Task HandleRoomCreate(JoinRoomEvent jre)
         {
-            try
+            State.UserId = jre.UserId;
+            State.Room = new RoomModel(jre.Name)
             {
-                await LocalStorage.SetItemAsync("token", room.Token);
-                State.Room = new RoomModel(room.Name)
-                {
-                    Settings = room.Settings,
-                    Users = room.Users,
-                    Started = room.Started,
-                    isHost = room.isHost
-                };
-                Navigation.NavigateTo("/room/" + room.RoomId);
-            }
-            catch (Exception ex)
-            {
-                await JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-            }
+                Settings = jre.Settings,
+                Users = jre.Users,
+                Started = jre.Started,
+                HostId = jre.UserId
+            };
+            Navigation.NavigateTo("/room/" + jre.RoomId);
+            return Task.CompletedTask;
         }
 
-        
         private async void JoinRoom(string id)
         {
             Validator.TryValidateObject(_user, new ValidationContext(_user), null, true);
@@ -72,6 +64,7 @@ namespace pixit.Client.Pages
                 RoomId = id,
                 User = _user
             });
+            Navigation.NavigateTo("/room/" + id);
         }
 
         public void Dispose()

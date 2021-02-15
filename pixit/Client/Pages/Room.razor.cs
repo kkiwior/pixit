@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Mapster;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
@@ -19,6 +20,7 @@ namespace pixit.Client.Pages
         [Inject] private Mediator Mediator { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
+        [Inject] private IJSRuntime JSRuntime { get; set; }
         
         private string Token { get; set; }
         private RoomModel RoomInfo { get; set; }
@@ -28,14 +30,37 @@ namespace pixit.Client.Pages
         {
             User = await LocalStorage.GetItemAsync<UserModel>("user");
             if (User == null) Navigation.NavigateTo("");
-            
-            Token = await LocalStorage.GetItemAsync<string>("token");
-            RoomInfo = State.Room;
+
+            RoomInfo = State?.Room;
             StateHasChanged();
-            
+
+            await Mediator.Register<JoinRoomEvent>(HandleJoinRoom);
+            await Mediator.Register<SetRoomHostEvent>(HandleSetRoomHost);
             await Mediator.Register<UserJoinedRoomEvent>(HandleUserJoined);
             await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
             await Mediator.Register<SettingsModel>(HandleSettingsUpdate);
+        }
+        
+        protected async Task HandleJoinRoom(JoinRoomEvent jre)
+        {
+            await LocalStorage.SetItemAsync("token", jre.Token);
+            Token = jre.Token;
+            RoomInfo = new RoomModel(jre.Name)
+            {
+                Settings = jre.Settings,
+                Users = jre.Users,
+                Started = jre.Started,
+                HostId = jre.HostId
+            };
+            State.UserId = jre.UserId;
+            StateHasChanged();
+        }
+
+        private Task HandleSetRoomHost(SetRoomHostEvent e)
+        {
+            RoomInfo.HostId = e.HostId;
+            StateHasChanged();
+            return Task.CompletedTask;
         }
 
         private Task HandleSettingsUpdate(SettingsModel settings)

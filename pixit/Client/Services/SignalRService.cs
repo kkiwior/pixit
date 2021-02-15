@@ -30,12 +30,13 @@ namespace pixit.Client.Services
         
         private void RegisterActions()
         {
-            HubConnection.On<Dictionary<string, LobbyListEvent>>("SendRooms", rooms => _mediator.Notify(rooms));
-            HubConnection.On<KeyValuePair<string, LobbyListEvent>>("SendRoom", rooms => _mediator.Notify(rooms));
-            HubConnection.On<JoinRoomEvent>("JoinRoomEvent", rooms => _mediator.Notify(rooms));
-            HubConnection.On<UserJoinedRoomEvent>("UserJoinedRoom", rooms => _mediator.Notify(rooms));
-            HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", rooms => _mediator.Notify(rooms));
-            HubConnection.On<SettingsModel>("UpdateRoomSettings", rooms => _mediator.Notify(rooms));
+            HubConnection.On<Dictionary<string, LobbyListEvent>>("SendRooms", args => _mediator.Notify(args));
+            HubConnection.On<KeyValuePair<string, LobbyListEvent>>("SendRoom", args => _mediator.Notify(args));
+            HubConnection.On<JoinRoomEvent>("JoinRoomEvent", args => _mediator.Notify(args));
+            HubConnection.On<UserJoinedRoomEvent>("UserJoinedRoom", args => _mediator.Notify(args));
+            HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", args => _mediator.Notify(args));
+            HubConnection.On<SettingsModel>("UpdateRoomSettings", args => _mediator.Notify(args));
+            HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _mediator.Notify(args));
         }
     }
 }
