@@ -351,21 +351,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-/pixit/Client/wwwroot/images/card3.webp
-/pixit/Client/wwwroot/images/card30.webp
-/pixit/Client/wwwroot/images/card31.webp
-/pixit/Client/wwwroot/images/card32.webp
-/pixit/Client/wwwroot/images/card33.webp
-/pixit/Client/wwwroot/images/card34.webp
-/pixit/Client/wwwroot/images/card35.webp
-/pixit/Client/wwwroot/images/card36.webp
-/pixit/Client/wwwroot/images/card37.webp
-/pixit/Client/wwwroot/images/card38.webp
-/pixit/Client/wwwroot/images/card39.webp
-/pixit/Client/wwwroot/images/card4.webp
-/pixit/Client/wwwroot/images/card40.webp
-/pixit/Client/wwwroot/images/card5.webp
-/pixit/Client/wwwroot/images/card6.webp
-/pixit/Client/wwwroot/images/card7.webp
-/pixit/Client/wwwroot/images/card8.webp
-/pixit/Client/wwwroot/images/card9.webp
+/pixit/Client/wwwroot/images/*
+/.idea/
