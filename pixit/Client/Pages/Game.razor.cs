@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using pixit.Client.Utils;
 
 namespace pixit.Client.Pages
 {
@@ -11,6 +12,7 @@ namespace pixit.Client.Pages
         private List<Player> Players = new();
         private List<Card> CardsHand = new();
 
+        [Inject] private StateContainer State { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

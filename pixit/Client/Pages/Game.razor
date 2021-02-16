@@ -1,4 +1,5 @@
 ﻿@page "/game"
+@using pixit.Shared.Models
 
 <div class="col-12 col-md-3 col-xl-2 p-0 primary">
     <div class="d-flex flex-column playerlist">
@@ -49,14 +50,49 @@
         </div>
 </div>
 <div class="col-12 col-md-9 col-xl-10 p-0">
-    <div class="container-fluid vh-100 p-0">
-        <div class="card-container" data-players="@Players.Count">
-            @foreach (Card card in CardsHand)
-            {
-                <div class="cardc">
-                    <img class="rounded-3 shadow" src="@card.Url"/>
-                </div>
-            }
+    @if (State.Game.State == GameState.UsersPicking)
+    {
+        <div class="container-fluid vh-100 p-0">
+            <div class="card-container">
+                @foreach (Card card in CardsHand)
+                {
+                    <div class="cardcover">
+                        <img class="rounded-3 shadow" src="images/cardcover.webp"/>
+                    </div>
+                }
+            </div>
+        </div>       
+    }
+    @if (State.Game.State == GameState.UsersVoting)
+    {
+        <div class="container-fluid vh-100 p-0">
+            <div class="card-container usercard-container" data-players="@Players.Count">
+                @foreach (Card card in CardsHand)
+                {
+                    <div class="cardc">
+                        <img class="rounded-3 shadow" src="@card.Url"/>
+                    </div>
+                }
+            </div>
         </div>
-    </div>
+    }
+    @if (State.Game.State == GameState.NarratorPicking || State.Game.State == GameState.UsersPicking)
+    {
+        <div class="container-fluid p-0">
+            <div class="card-container deck-container">
+                @if (true) // jesli narrator
+                {
+                    <div class="clue">
+                        <textarea placeholder="Wskazówka..."></textarea>
+                    </div>
+                }
+                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+            </div>
+        </div>
+    }
 </div>

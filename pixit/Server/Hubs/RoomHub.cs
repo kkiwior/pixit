@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mapster;
 using Microsoft.AspNetCore.SignalR;
+using pixit.Server.Repositiories;
 using pixit.Server.Services;
 using pixit.Shared.Models;
 using pixit.Shared.Models.Events;
@@ -11,48 +12,48 @@ namespace pixit.Server.Hubs
 {
     public class RoomHub : GameHub
     {
-        private readonly RoomService _rooms;
+        private readonly RoomService _roomService;
+        private readonly RoomRepository _rooms;
 
-        public RoomHub(RoomService roomService)
+        public RoomHub(RoomService roomService, RoomRepository roomRepository)
         {
-            _rooms = roomService;
+            _rooms = roomRepository;
+            _roomService = roomService;
         }
 
         
         public override async Task OnConnectedAsync()
         {
-
+            Context.Items.Add("room", null);
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            if (Context.Items.ContainsKey("room"))
+            Context.Items.TryGetValue("room", out var roomId);
+            UserLeftRoom(new UserLeftRoomEvent()
             {
-                UserLeftRoom(new UserLeftRoomEvent()
-                {
-                    RoomId = Context.Items["room"]?.ToString(),
-                    Token = Context.ConnectionId
-                });
-            }
+                RoomId = roomId?.ToString(), 
+                Token = Context.ConnectionId
+            });
         }
 
         
         public async Task GetRooms()
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "lobby");
-            await Clients.Caller.SendAsync("SendRooms", await _rooms.GetRooms());
+            await Clients.Caller.SendAsync("SendRooms", await _rooms.GetAllRooms());
         }
 
         public async Task SendRoom(string roomId)
         {
-            RoomModel room = await _rooms.Get(roomId);
+            RoomModel room = await _rooms.GetRoomById(roomId);
             await Clients.Group("lobby").SendAsync("SendRoom", new KeyValuePair<string, LobbyListEvent>(roomId, room.Adapt<LobbyListEvent>()));
         }
 
         
         public async Task CreateRoom(CreateRoomEvent roomData)
         {
-            await Clients.Caller.SendAsync("CreateRoom", await _rooms.Create(roomData));
+            await Clients.Caller.SendAsync("CreateRoom", await _roomService.Create(roomData));
         }
         
 
@@ -66,15 +67,15 @@ namespace pixit.Server.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, data.RoomId);
             await Groups.AddToGroupAsync(Context.ConnectionId, "lobby");
-            await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", await _rooms.LeaveRoom(Context.Items["room"]?.ToString(), Context.ConnectionId));
-            Context.Items.Remove("room");
+            await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", await _roomService.LeaveRoom(Context.Items["room"]?.ToString(), Room, Context.ConnectionId));
+            Context.Items["room"] = null;
             await SendRoom(data.RoomId);
         }
         
         
         public async Task JoinRoom(string roomId, UserModel user)
         {
-            JoinRoomEvent jre = await _rooms.JoinRoom(roomId, user, Context.ConnectionId);
+            JoinRoomEvent jre = await _roomService.JoinRoom(roomId, user, Context.ConnectionId);
             if (jre == null)
             {
                 await Clients.Caller.SendAsync("JoinRoomEvent", new JoinRoomEvent()
@@ -87,22 +88,22 @@ namespace pixit.Server.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
             await Clients.Caller.SendAsync("JoinRoomEvent", jre);
             await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("UserJoinedRoom", user);
-            Context.Items.Add("room", roomId);
+            Context.Items["room"] = roomId;
             await SendRoom(roomId);
-            if (jre.Users.Count == 1) await _rooms.SetRoomHost(roomId);
+            if (jre.Users.Count == 1) await _roomService.SetRoomHost(roomId, Room);
         }    
         
 
         public async Task UpdateSettings(SettingsModel settings)
         {
-            await _rooms.UpdateSettings(Context.Items["room"]?.ToString(), settings, Context.ConnectionId);
+            await _roomService.UpdateSettings(Context.Items["room"]?.ToString(), Room, settings, Context.ConnectionId);
             await SendRoom(Context.Items["room"]?.ToString());
         }
 
 
         public async Task KickUser(KickUserEvent user)
         {
-            string connectionId = await _rooms.KickUser(Context.Items["room"]?.ToString(), user, Context.ConnectionId);
+            string connectionId = await _roomService.KickUser(Context.Items["room"]?.ToString(), Room, user, Context.ConnectionId);
             await Clients.Client(connectionId).SendAsync("KickUser", user);
         }
     }

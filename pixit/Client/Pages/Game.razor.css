@@ -2,20 +2,57 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    max-height: 100vh;
     justify-content: center;
+}
+
+.usercard-container {
+    max-height: 100vh;
 }
 
 .cardc {
     padding: 6px;
 }
 
-.cardc img {
+.cardcover {
+    max-width: 100px;
+    padding: 2px;
+}
+
+.cardd img, .cardc img, .cardcover img {
     width: 100%;
     height: 100%;
 }
 
 
+.deck-container {
+    position: absolute;
+    bottom: 0;
+}
+
+.cardd {
+    width: 15.5%;
+    margin: 0 3px 4px 3px;
+    height: 100%;
+}
+
+.clue {
+    width: 100%;
+}
+
+.clue textarea {
+    resize: none;
+    min-width: 400px;
+    max-height: 54px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-bottom: 4px;
+    outline: none;
+    border: none;
+    padding: 2px 4px;
+    background-color: var(--primary);
+    color: white;
+}
 
 
 

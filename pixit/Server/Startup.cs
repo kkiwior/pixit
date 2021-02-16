@@ -5,8 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using pixit.Server.Hubs;
+using pixit.Server.Repositiories;
 using pixit.Server.Services;
 using pixit.Server.Utils;
 using StackExchange.Redis.Extensions.Core;
@@ -29,7 +31,10 @@ namespace pixit.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSignalR().AddNewtonsoftJsonProtocol((options) =>
+            services.AddSignalR(options =>
+            {
+                options.AddFilter<RoomToHubInvoke>();
+            }).AddNewtonsoftJsonProtocol((options) =>
             {
                 options.PayloadSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
@@ -44,7 +49,9 @@ namespace pixit.Server
             });
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSingleton<RoomRepository>();
             services.AddSingleton<RoomService>();
+            services.AddSingleton<GameService>();
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

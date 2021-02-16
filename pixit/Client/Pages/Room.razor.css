@@ -40,3 +40,16 @@
 .controls button:before {
     color: black;
 }
+
+button {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--background);
+    outline: none;
+    background-color: var(--primary);
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.6;
+}
