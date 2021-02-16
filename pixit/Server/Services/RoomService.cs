@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
 using Microsoft.AspNetCore.SignalR;
@@ -48,19 +49,17 @@ namespace pixit.Server.Services
         }
         
         
-        public async Task<UserLeftRoomEvent> LeaveRoom(string roomId, RoomModel room, string connectionid)
+        public async Task LeaveRoom(string roomId, RoomModel room, string connectionid)
         {
-            var user = room.Users.Find(u => u.Token == connectionid);
-            room.Users.RemoveAll(u => u.Token == connectionid);
-            if (room.UsersOnline == 0)
+            if (room.UsersOnline == 1)
             {
                 await _rooms.Remove(roomId);
-                return null;
+                return;
             }
             
+            UserModel user = await RemoveUserFromRoom(roomId, room, null, connectionid);
             await _rooms.Save(roomId, room);
             if (room.Settings.HostToken == user?.Token) await SetRoomHost(roomId, room);
-            return new UserLeftRoomEvent(user?.Id);
         }
 
         public async Task SetRoomHost(string roomId, RoomModel room)
@@ -82,10 +81,27 @@ namespace pixit.Server.Services
         }
         
         
-        public async Task<string> KickUser(string roomId, RoomModel room, KickUserEvent user, string connectionid)
+        public async Task<string> KickUser(string roomId, RoomModel room, KickUserEvent userToKick, string connectionid)
         {
             if (room.Settings.HostToken != connectionid) return null;
-            return room.Users.Find(e => e.Id == user.UserId)?.Token;
+            UserModel user = await RemoveUserFromRoom(roomId, room, userToKick.UserId);
+            return user.Token;
+        }
+
+        public async Task<UserModel> RemoveUserFromRoom(string roomId, RoomModel room, string userId = null, string token = null)
+        {
+            if (token == null)
+            {
+                token = await Task.FromResult(room.Users.Find(u=> u.Id == userId).Token);
+            }
+            
+            int index = await Task.FromResult(room.Users.FindIndex(u => u.Token == token));
+            UserModel user = room.Users[index];
+            room.Users.RemoveAt(index);
+            await _hub.Groups.RemoveFromGroupAsync(token, roomId);
+            await _hub.Groups.AddToGroupAsync(token, "lobby");
+            await _hub.Clients.Group(roomId).SendAsync("UserLeftRoom", new UserLeftRoomEvent(user?.Id));
+            return user;
         }
     }
 }

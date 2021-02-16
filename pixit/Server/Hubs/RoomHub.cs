@@ -21,20 +21,23 @@ namespace pixit.Server.Hubs
             _roomService = roomService;
         }
 
-        
+
         public override async Task OnConnectedAsync()
         {
             Context.Items.Add("room", null);
+            await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
             Context.Items.TryGetValue("room", out var roomId);
-            UserLeftRoom(new UserLeftRoomEvent()
+            Room = await _rooms.GetRoomById(roomId.ToString());
+            await UserLeftRoom(new UserLeftRoomEvent()
             {
                 RoomId = roomId?.ToString(), 
                 Token = Context.ConnectionId
             });
+            await base.OnDisconnectedAsync(ex);
         }
 
         
@@ -65,9 +68,7 @@ namespace pixit.Server.Hubs
 
         public async Task UserLeftRoom(UserLeftRoomEvent data)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, data.RoomId);
-            await Groups.AddToGroupAsync(Context.ConnectionId, "lobby");
-            await Clients.Group(data.RoomId).SendAsync("UserLeftRoom", await _roomService.LeaveRoom(Context.Items["room"]?.ToString(), Room, Context.ConnectionId));
+            await _roomService.LeaveRoom(Context.Items["room"]?.ToString(), Room, Context.ConnectionId);
             Context.Items["room"] = null;
             await SendRoom(data.RoomId);
         }
