@@ -3,11 +3,11 @@
 
 <div class="col-12 col-md-3 col-xl-2 p-0 primary">
     <div class="d-flex flex-column playerlist">
-        @foreach (Player player in Players)
+        @foreach (UserModel user in State.Room.Users)
         {
             <div class="players container-fluid p-0">
                 <div class="player row p-2 m-0">
-                    <div class="avatar p-0 my-auto" align="center"><img class="rounded-circle" src="https://via.placeholder.com/300" height="auto" width="48px"/>
+                    <div class="avatar p-0 my-auto" align="center"><Avatar IsHost="false" Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="48"/>
                         <div class="waiting">
                             <svg width="31px" height="26px" viewBox="0 0 73 88" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                 <g id="hourglass">
@@ -39,8 +39,8 @@
                     <div class="col pr-0 my-auto">
                         <div class="container-fluid p-0">
                             <div class="row">
-                                <div class="name col-10 col-md-11 my-auto">&nbsp;@player.Name</div>
-                                <div class="score col-2 col-md-1 p-0 my-auto ml-auto">@player.Score</div>
+                                <div class="name col-10 col-md-11 my-auto">&nbsp;@user.Name</div>
+                                <div class="score col-2 col-md-1 p-0 my-auto ml-auto">22</div>
                             </div>
                         </div>
                         </div>
@@ -54,7 +54,7 @@
     {
         <div class="container-fluid vh-100 p-0">
             <div class="card-container">
-                @foreach (Card card in CardsHand)
+                @foreach (CardModel card in State.CardDeck)
                 {
                     <div class="cardcover">
                         <img class="rounded-3 shadow" src="images/cardcover.webp"/>
@@ -66,11 +66,11 @@
     @if (State.Game.State == GameState.UsersVoting)
     {
         <div class="container-fluid vh-100 p-0">
-            <div class="card-container usercard-container" data-players="@Players.Count">
-                @foreach (Card card in CardsHand)
+            <div class="card-container usercard-container" data-players="@State.Room.Users.Count">
+                @foreach (CardModel card in State.CardDeck)
                 {
                     <div class="cardc">
-                        <img class="rounded-3 shadow" src="@card.Url"/>
+                        <img class="rounded-3 shadow" src="images/card@(card.Id).webp"/>
                     </div>
                 }
             </div>
@@ -86,12 +86,12 @@
                         <textarea placeholder="Wskazówka..."></textarea>
                     </div>
                 }
-                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
-                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
-                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
-                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
-                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
-                <div class="cardd"><img class="rounded-3 shadow" src="images/card1.webp"/></div>
+                @foreach (CardModel card in State.CardDeck)
+                {
+                    <div class="cardd">
+                        <img class="rounded-3 shadow" src="images/card@(card.Id).webp"/>
+                    </div>
+                }
             </div>
         </div>
     }

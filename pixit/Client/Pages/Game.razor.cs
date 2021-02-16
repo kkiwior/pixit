@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using pixit.Client.Utils;
+using pixit.Shared.Models;
 
 namespace pixit.Client.Pages
 {
     partial class Game
     {
-        private List<Player> Players = new();
-        private List<Card> CardsHand = new();
-
         [Inject] private StateContainer State { get; set; }
+        [Inject] private Mediator Mediator { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -25,44 +24,17 @@ namespace pixit.Client.Pages
         
         protected override async Task OnInitializedAsync()
         {
-            //funkcja i klasy tylko do testów
-            Players.Add(new Player("Lorem ipsum", 21));
-            Players.Add(new Player("Lorem ipsum", 21));
-            Players.Add(new Player("Lorem ipsum", 21));
-            Players.Add(new Player("Lorem ipsum", 21));
-            Players.Add(new Player("Lorem ipsum", 21));
-            Players.Add(new Player("Lorem ipsum", 21));
-            Players.Add(new Player("Lorem ipsum", 21));
+            JSRuntime.InvokeVoidAsync("console.log", "nie karty");
 
-
-
-            for (int i = 0; i < Players.Count; ++i)
-            {
-                CardsHand.Add(new Card($"images/card{i+1}.webp"));
-            }
+            await Mediator.Register<GameModel>(HandleGameUpdate);
         }
         
-    }
 
-    public class Player
-    {
-        public string Name { get; set; }
-        public int Score { get; set; }
-
-        public Player(string n, int s)
+        private Task HandleGameUpdate(GameModel arg)
         {
-            Name = n;
-            Score = s;
-        }
-    }
-
-    public class Card
-    {
-        public string Url { get; set; }
-
-        public Card(string url)
-        {
-            Url = url;
+            State.Game = arg;
+            StateHasChanged();
+            return Task.CompletedTask;
         }
     }
 }

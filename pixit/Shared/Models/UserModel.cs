@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using pixit.Shared.Utils;
 
@@ -16,6 +18,8 @@ namespace pixit.Shared.Models
         [JsonIgnore]
         public string Token { get; set; }
 
+        [JsonIgnore] 
+        public List<CardModel> CardDeck { get; set; } = new();
 
         [NestedObjectValidation]
         public AvatarModel Avatar { get; set; } = new();

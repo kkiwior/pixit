@@ -12,9 +12,11 @@ namespace pixit.Client.Services
     {
         internal readonly HubConnection HubConnection;
         private readonly Mediator _mediator;
+        private readonly StateContainer _state;
 
-        public SignalRService(HttpClient client, Mediator mediator)
+        public SignalRService(HttpClient client, Mediator mediator, StateContainer state)
         {
+            _state = state;
             _mediator = mediator;
             HubConnection = new HubConnectionBuilder()
                 .WithUrl(client.BaseAddress?.AbsoluteUri + "roomhub")
@@ -39,8 +41,8 @@ namespace pixit.Client.Services
             HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _mediator.Notify(args));
             HubConnection.On<CreateRoomEvent>("CreateRoom", args => _mediator.Notify(args));
             HubConnection.On<KickUserEvent>("KickUser", args => _mediator.Notify(args));
-            
-            
+            HubConnection.On<GameModel>("UpdateGameState", args => _mediator.Notify(args));
+            HubConnection.On<CardModel>("RefillCards", args => _state.CardDeck.Add(args));
         }
     }
 }

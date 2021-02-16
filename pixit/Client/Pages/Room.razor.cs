@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Mapster;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
@@ -50,6 +51,15 @@ namespace pixit.Client.Pages
             await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
             await Mediator.Register<SettingsModel>(HandleSettingsUpdate);
             await Mediator.Register<KickUserEvent>(HandleKick);
+            await Mediator.Register<GameModel>(HandleGameStart);
+            Navigation.LocationChanged += LocationChanged;
+        }
+
+        private Task HandleGameStart(GameModel arg)
+        {
+            State.Game = arg;
+            Navigation.NavigateTo("game");
+            return Task.CompletedTask;
         }
 
         private Task HandleKick(KickUserEvent arg)
@@ -114,7 +124,19 @@ namespace pixit.Client.Pages
 
         public void Dispose()
         {
-            if (State.Room?.Name != null)
+            Mediator.Unregister<JoinRoomEvent>();
+            Mediator.Unregister<SetRoomHostEvent>();
+            Mediator.Unregister<UserJoinedRoomEvent>();
+            Mediator.Unregister<UserLeftRoomEvent>();
+            Mediator.Unregister<SettingsModel>();
+            Mediator.Unregister<KickUserEvent>();
+            Mediator.Unregister<GameModel>();
+            Navigation.LocationChanged -= LocationChanged;
+        }
+
+        private void LocationChanged(object? sender, LocationChangedEventArgs e)
+        {
+            if (State.Room?.Name != null && !e.Location.Contains("game"))
             {
                 Event.UserLeftRoom(new UserLeftRoomEvent
                 {
@@ -122,12 +144,6 @@ namespace pixit.Client.Pages
                     RoomId = RoomId
                 });               
             }
-            Mediator.Unregister<JoinRoomEvent>();
-            Mediator.Unregister<SetRoomHostEvent>();
-            Mediator.Unregister<UserJoinedRoomEvent>();
-            Mediator.Unregister<UserLeftRoomEvent>();
-            Mediator.Unregister<SettingsModel>();
-            Mediator.Unregister<KickUserEvent>();
         }
 
         private void KickUser(string userId)

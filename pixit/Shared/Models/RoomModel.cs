@@ -19,11 +19,14 @@ namespace pixit.Shared.Models
         public bool Started { get; set; }
 
         public string HostId { get; set; }
+        
+        public GameModel Game { get; set; }
 
         public RoomModel(string name)
         {
             Name = name;
             Settings = new();
+            Game = new();
         }
     }
 }

@@ -1,14 +1,27 @@
-﻿namespace pixit.Shared.Models
+﻿using Newtonsoft.Json;
+
+namespace pixit.Shared.Models
 {
     public class GameModel
     {
 
         public GameState State { get; set; }
+        
+        [JsonIgnore]
+        public RNG RNG { get; set; }
 
         public GameModel()
         {
-            State = GameState.UsersPicking;
+            RNG = new();
+            State = GameState.NarratorPicking;
         }
+    }
+
+    public class RNG
+    {
+        public int Seed { get; set; }
+        public int Increment { get; set; }
+        public int Max { get; set; }
     }
     
     public enum GameState

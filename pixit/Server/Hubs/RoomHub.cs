@@ -5,20 +5,24 @@ using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using pixit.Server.Repositiories;
 using pixit.Server.Services;
+using pixit.Server.Utils;
 using pixit.Shared.Models;
 using pixit.Shared.Models.Events;
 
 namespace pixit.Server.Hubs
 {
-    public class RoomHub : GameHub
+    public partial class RoomHub : RoomToHubExtension
     {
         private readonly RoomService _roomService;
         private readonly RoomRepository _rooms;
+        private readonly GameService _games;
 
-        public RoomHub(RoomService roomService, RoomRepository roomRepository)
+
+        public RoomHub(RoomService roomService, RoomRepository roomRepository, GameService gameService)
         {
             _rooms = roomRepository;
             _roomService = roomService;
+            _games = gameService;
         }
 
 
@@ -31,12 +35,15 @@ namespace pixit.Server.Hubs
         public override async Task OnDisconnectedAsync(Exception ex)
         {
             Context.Items.TryGetValue("room", out var roomId);
-            Room = await _rooms.GetRoomById(roomId.ToString());
-            await UserLeftRoom(new UserLeftRoomEvent()
+            if (roomId.ToString() != null)
             {
-                RoomId = roomId?.ToString(), 
-                Token = Context.ConnectionId
-            });
+                Room = await _rooms.GetRoomById(roomId.ToString());
+                await UserLeftRoom(new UserLeftRoomEvent()
+                {
+                    RoomId = roomId?.ToString(), 
+                    Token = Context.ConnectionId
+                });
+            }
             await base.OnDisconnectedAsync(ex);
         }
 

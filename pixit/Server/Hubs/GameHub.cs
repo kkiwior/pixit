@@ -1,26 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using pixit.Server.Services;
 using pixit.Server.Utils;
 
 namespace pixit.Server.Hubs
 {
-    public class GameHub : RoomToHubExtension
+    partial class RoomHub
     {
-        private readonly GameService _games;
-
-        public GameHub(GameService gameService)
-        {
-            _games = gameService;
-        }
-
-        protected GameHub()
-        {
-        }
-
         public async Task StartGame()
         {
-            
+            await _games.StartGame(Context.Items["room"]?.ToString(), Room, Context.ConnectionId);
         }
     }
 }
