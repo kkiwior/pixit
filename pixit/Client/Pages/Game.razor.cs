@@ -18,14 +18,12 @@ namespace pixit.Client.Pages
         {
             if (firstRender)
             {
-                JSRuntime.InvokeVoidAsync("handleResize");
+                await JSRuntime.InvokeVoidAsync("handleResize");
             }
         }
         
         protected override async Task OnInitializedAsync()
         {
-            JSRuntime.InvokeVoidAsync("console.log", "nie karty");
-
             await Mediator.Register<GameModel>(HandleGameUpdate);
         }
         

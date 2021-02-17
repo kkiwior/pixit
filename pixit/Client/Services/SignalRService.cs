@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using Mapster;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using pixit.Client.Utils;
@@ -12,7 +14,7 @@ namespace pixit.Client.Services
     {
         internal readonly HubConnection HubConnection;
         private readonly Mediator _mediator;
-        private readonly StateContainer _state;
+        private StateContainer _state;
 
         public SignalRService(HttpClient client, Mediator mediator, StateContainer state)
         {
@@ -35,13 +37,14 @@ namespace pixit.Client.Services
             HubConnection.On<Dictionary<string, LobbyListEvent>>("SendRooms", args => _mediator.Notify(args));
             HubConnection.On<KeyValuePair<string, LobbyListEvent>>("SendRoom", args => _mediator.Notify(args));
             HubConnection.On<JoinRoomEvent>("JoinRoomEvent", args => _mediator.Notify(args));
-            HubConnection.On<UserJoinedRoomEvent>("UserJoinedRoom", args => _mediator.Notify(args));
-            HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", args => _mediator.Notify(args));
             HubConnection.On<SettingsModel>("UpdateRoomSettings", args => _mediator.Notify(args));
-            HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _mediator.Notify(args));
             HubConnection.On<CreateRoomEvent>("CreateRoom", args => _mediator.Notify(args));
             HubConnection.On<KickUserEvent>("KickUser", args => _mediator.Notify(args));
             HubConnection.On<GameModel>("UpdateGameState", args => _mediator.Notify(args));
+  
+            HubConnection.On<UserJoinedRoomEvent>("UserJoinedRoom", args => _state.Room.Users.Add(args.Adapt<UserModel>()));
+            HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", args => _state.Room.Users.Remove(_state.Room.Users.FirstOrDefault(u=>u.Id == args.Id)));
+            HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _state.Room.HostId = args.HostId);
             HubConnection.On<CardModel>("RefillCards", args => _state.CardDeck.Add(args));
         }
     }

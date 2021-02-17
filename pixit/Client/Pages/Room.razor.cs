@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
-using Mapster;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
@@ -15,19 +13,20 @@ namespace pixit.Client.Pages
     public partial class Room : IDisposable
     {
         [Parameter] public string RoomId { get; set; }
-        
+
         [Inject] private ILocalStorageService LocalStorage { get; set; }
         [Inject] private SendEventService Event { get; set; }
         [Inject] private Mediator Mediator { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
-        [Inject] private IJSRuntime JSRuntime { get; set; }
-        
+
         private string Token { get; set; }
         private UserModel User { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            State.PropertyChanged += (_, _) => StateHasChanged(); 
+
             User = await LocalStorage.GetItemAsync<UserModel>("user");
             if (User == null)
             {
@@ -36,7 +35,7 @@ namespace pixit.Client.Pages
                 return;
             }
             User.Validate();
-            
+
             await Event.UserJoinRoom(new JoinRoomEvent()
             {
                 RoomId = RoomId,
@@ -47,14 +46,12 @@ namespace pixit.Client.Pages
 
             await Mediator.Register<JoinRoomEvent>(HandleJoinRoom);
             await Mediator.Register<SetRoomHostEvent>(HandleSetRoomHost);
-            await Mediator.Register<UserJoinedRoomEvent>(HandleUserJoined);
-            await Mediator.Register<UserLeftRoomEvent>(HandleUserLeft);
             await Mediator.Register<SettingsModel>(HandleSettingsUpdate);
             await Mediator.Register<KickUserEvent>(HandleKick);
             await Mediator.Register<GameModel>(HandleGameStart);
             Navigation.LocationChanged += LocationChanged;
         }
-
+        
         private Task HandleGameStart(GameModel arg)
         {
             State.Game = arg;
@@ -102,23 +99,9 @@ namespace pixit.Client.Pages
             return Task.CompletedTask;
         }
 
-        protected Task HandleUserJoined(UserJoinedRoomEvent user)
-        {
-            State.Room.Users.Add(user.Adapt<UserModel>());
-            StateHasChanged();
-            return Task.CompletedTask;
-        }
-        
-        protected Task HandleUserLeft(UserLeftRoomEvent user)
-        {
-            State.Room.Users.RemoveAll(u=>u.Id == user.Id);
-            StateHasChanged();
-            return Task.CompletedTask;
-        }
-
         protected async Task UpdateSettings()
         {
-            if(State.Room.Settings.Slots >= State.Room.Users.Count && State.Room.Settings.Slots <= 20 && State.Room.Settings.MaxScore >= 5 && State.Room.Settings.MaxScore <= 100)
+            if (State.Room.Settings.Slots >= State.Room.Users.Count && State.Room.Settings.Slots <= 20 && State.Room.Settings.MaxScore >= 5 && State.Room.Settings.MaxScore <= 100)
                 await Event.UpdateSettings(State.Room.Settings);
         }
 
@@ -126,8 +109,6 @@ namespace pixit.Client.Pages
         {
             Mediator.Unregister<JoinRoomEvent>();
             Mediator.Unregister<SetRoomHostEvent>();
-            Mediator.Unregister<UserJoinedRoomEvent>();
-            Mediator.Unregister<UserLeftRoomEvent>();
             Mediator.Unregister<SettingsModel>();
             Mediator.Unregister<KickUserEvent>();
             Mediator.Unregister<GameModel>();
@@ -142,7 +123,7 @@ namespace pixit.Client.Pages
                 {
                     Token = Token,
                     RoomId = RoomId
-                });               
+                });
             }
         }
 

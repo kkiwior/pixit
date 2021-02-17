@@ -92,12 +92,11 @@ namespace pixit.Server.Services
         {
             if (token == null)
             {
-                token = await Task.FromResult(room.Users.Find(u=> u.Id == userId).Token);
+                token = await Task.FromResult(room.Users.FirstOrDefault(u => u.Id == userId)?.Token);
             }
             
-            int index = await Task.FromResult(room.Users.FindIndex(u => u.Token == token));
-            UserModel user = room.Users[index];
-            room.Users.RemoveAt(index);
+            UserModel user = await Task.FromResult(room.Users.FirstOrDefault(u => u.Token == token));
+            room.Users.Remove(user);
             await _hub.Groups.RemoveFromGroupAsync(token, roomId);
             await _hub.Groups.AddToGroupAsync(token, "lobby");
             await _hub.Clients.Group(roomId).SendAsync("UserLeftRoom", new UserLeftRoomEvent(user?.Id));

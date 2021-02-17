@@ -19,7 +19,7 @@ namespace pixit.Client.Pages
         [Inject] private SendEventService Event { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
-        
+
         //[Inject] private IJSRuntime JSRuntime { get; set; }
 
         private Modal _modal = new();
@@ -27,9 +27,10 @@ namespace pixit.Client.Pages
 
         private CreateRoomEvent CreateRoomForm = new();
         Dictionary<string, LobbyListEvent> _roomList = new();
-        
+
         protected override async Task OnInitializedAsync()
         {
+            State.PropertyChanged += (_, _) => StateHasChanged(); 
             _user = await LocalStorage.GetItemAsync<UserModel>("user");
 
             await Mediator.Register<Dictionary<string, LobbyListEvent>>(HandleGetRooms);
@@ -48,7 +49,7 @@ namespace pixit.Client.Pages
         {
             Validator.TryValidateObject(_user, new ValidationContext(_user), null, true);
             await LocalStorage.SetItemAsync("user", _user);
-            
+
             Navigation.NavigateTo("/room/" + id);
         }
 
@@ -82,10 +83,10 @@ namespace pixit.Client.Pages
             }
             StateHasChanged();
             return Task.CompletedTask;
-        } 
+        }
 
         private void CreateRoomDialog() => _modal.Toggle();
-        
+
         private async void CreateRoom()
         {
             Validator.TryValidateObject(_user, new ValidationContext(_user), null, true);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using pixit.Client.Pages;
@@ -34,7 +35,7 @@ namespace pixit.Server.Services
 
         private async Task RefillCardsForEveryone(string roomId, RoomModel room)
         {
-            room.Users.ForEach(async u =>
+            room.Users.ToList().ForEach(async u =>
             {
                 while (u.CardDeck.Count < 6)
                 {
