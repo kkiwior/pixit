@@ -46,6 +46,7 @@ namespace pixit.Client.Services
             HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", args => _state.Room.Users.Remove(_state.Room.Users.FirstOrDefault(u=>u.Id == args.Id)));
             HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _state.Room.HostId = args.HostId);
             HubConnection.On<CardModel>("RefillCards", args => _state.CardDeck.Add(args));
+            HubConnection.On<CardModel>("TakeCard", args => _state.CardDeck.Remove(_state.CardDeck.FirstOrDefault(u=>u.Id == args.Id)));
         }
     }
 }

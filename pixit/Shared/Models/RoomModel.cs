@@ -25,7 +25,7 @@ namespace pixit.Shared.Models
             set
             {
                 _users = value;
-                _users.CollectionChanged += (sender, args) => OnPropertyChanged("");
+                _users.CollectionChanged += (_, _) => OnPropertyChanged("");
             }
         }
 
@@ -45,6 +45,7 @@ namespace pixit.Shared.Models
             set
             {
                 _game = value;
+                _game.PropertyChanged += OnNestedPropertyChanged;
                 OnPropertyChanged();
             }
         }
@@ -60,6 +61,11 @@ namespace pixit.Shared.Models
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        
+        protected void OnNestedPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            PropertyChanged?.Invoke(this, args);
         }
     }
 }

@@ -54,7 +54,7 @@ namespace pixit.Client.Pages
         
         private Task HandleGameStart(GameModel arg)
         {
-            State.Game = arg;
+            State.Room.Game = arg;
             Navigation.NavigateTo("game");
             return Task.CompletedTask;
         }
@@ -115,7 +115,7 @@ namespace pixit.Client.Pages
             Navigation.LocationChanged -= LocationChanged;
         }
 
-        private void LocationChanged(object? sender, LocationChangedEventArgs e)
+        private void LocationChanged(object sender, LocationChangedEventArgs e)
         {
             if (State.Room?.Name != null && !e.Location.Contains("game"))
             {
