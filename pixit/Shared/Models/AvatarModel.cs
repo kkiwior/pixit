@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using pixit.Shared.Utils;
 
 namespace pixit.Shared.Models

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using pixit.Server.Services;
-using pixit.Server.Utils;
+﻿using System.Threading.Tasks;
 using pixit.Shared.Models.Events;
 
 namespace pixit.Server.Hubs

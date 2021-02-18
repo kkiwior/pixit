@@ -84,14 +84,13 @@
 .gamecard {
     width: 100%;
     height: 100%;
-    transform: 0.2s;
+    transition-duration: 0.2s;
 }
 
 .cardflex:active .gamecard {
     width: 380px;
     height: auto;
     max-width: 60%;
-    max-height: auto;
     position: fixed;
     top: 50%;
     left: 50%;

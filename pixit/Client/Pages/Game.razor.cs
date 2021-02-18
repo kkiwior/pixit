@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
@@ -13,31 +11,23 @@ namespace pixit.Client.Pages
     partial class Game
     {
         [Inject] private StateContainer State { get; set; }
-        [Inject] private Mediator Mediator { get; set; }
-        [Inject] private IJSRuntime JSRuntime { get; set; }
+        [Inject] private IJSRuntime JsRuntime { get; set; }
         [Inject] private SendEventService Event { get; set; }
 
-        private string Clue;
+        private string _clue;
+
+        protected override Task OnInitializedAsync()
+        {
+            State.PropertyChanged += (_, _) => StateHasChanged();
+            return base.OnInitializedAsync();
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("handleResize");
+                await JsRuntime.InvokeVoidAsync("handleResize");
             }
-        }
-        
-        protected override async Task OnInitializedAsync()
-        {
-            await Mediator.Register<GameModel>(HandleGameUpdate);
-        }
-        
-
-        private Task HandleGameUpdate(GameModel arg)
-        {
-            State.Room.Game = arg;
-            StateHasChanged();
-            return Task.CompletedTask;
         }
 
         private async Task SendCard(CardModel card)
@@ -46,7 +36,7 @@ namespace pixit.Client.Pages
             await Event.SelectCard(new SelectCardEvent()
             {
                 Card = card,
-                Clue = (State.Room.Game.Narrator.UserId == State.UserId ? Clue : null)
+                Clue = (State.Room.Game.Narrator.UserId == State.UserId ? _clue : null)
             });
         }
 

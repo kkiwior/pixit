@@ -1,7 +1,7 @@
-﻿@if (display)
+﻿@if (_display)
 {
     <div class="overlay">
-        <div class='modal fade center-block @(display ? "fade-in" : "")' tabindex="-1" aria-modal="true" role="dialog">
+        <div class='modal fade center-block @(_display ? "fade-in" : "")' tabindex="-1" aria-modal="true" role="dialog">
             <div class="modal-dialog-centered modal-sm">
                 <div class="modal-content primary rounded-0">
                     <div class="modal-header">

@@ -32,12 +32,12 @@
 <Modal @ref="_modal">
     <Title>Tworzenie pokoju</Title>
     <Body>
-            <EditForm Model="@CreateRoomForm" OnValidSubmit="@CreateRoom">
+            <EditForm Model="@_createRoomForm" OnValidSubmit="@CreateRoom">
                 <DataAnnotationsValidator />
                 <div class="form-group">
                     <label for="name">Nazwa pokoju</label>
-                    <InputText id="name" @bind-Value="CreateRoomForm.Name" class="form-control" />
-                    <ValidationMessage For="()=> CreateRoomForm.Name" />
+                    <InputText id="name" @bind-Value="_createRoomForm.Name" class="form-control" />
+                    <ValidationMessage For="()=> _createRoomForm.Name" />
                 </div>
                 <div class="text-center">
                     <button class="btn secondary m-2">

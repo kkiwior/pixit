@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
@@ -19,13 +18,11 @@ namespace pixit.Client.Pages
         [Inject] private SendEventService Event { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
-
-        //[Inject] private IJSRuntime JSRuntime { get; set; }
-
+        
         private Modal _modal = new();
         private UserModel _user;
 
-        private CreateRoomEvent CreateRoomForm = new();
+        private readonly CreateRoomEvent _createRoomForm = new();
         Dictionary<string, LobbyListEvent> _roomList = new();
 
         protected override async Task OnInitializedAsync()
@@ -38,6 +35,13 @@ namespace pixit.Client.Pages
             await Mediator.Register<CreateRoomEvent>(HandleCreateRoom);
             await Event.GetRooms();
         }
+        
+        public void Dispose()
+        {
+            Mediator.Unregister<Dictionary<string, LobbyListEvent>>();
+            Mediator.Unregister<KeyValuePair<string, LobbyListEvent>>();
+            Mediator.Unregister<CreateRoomEvent>();
+        }
 
         private Task HandleCreateRoom(CreateRoomEvent e)
         {
@@ -47,19 +51,11 @@ namespace pixit.Client.Pages
 
         private async void JoinRoom(string id)
         {
-            Validator.TryValidateObject(_user, new ValidationContext(_user), null, true);
+            _user.Validate();
             await LocalStorage.SetItemAsync("user", _user);
-
             Navigation.NavigateTo("/room/" + id);
         }
-
-        public void Dispose()
-        {
-            Mediator.Unregister<Dictionary<string, LobbyListEvent>>();
-            Mediator.Unregister<KeyValuePair<string, LobbyListEvent>>();
-            Mediator.Unregister<CreateRoomEvent>();
-        }
-
+        
         protected Task HandleGetRooms(Dictionary<string, LobbyListEvent> rooms)
         {
             _roomList = rooms;
@@ -89,10 +85,10 @@ namespace pixit.Client.Pages
 
         private async void CreateRoom()
         {
-            Validator.TryValidateObject(_user, new ValidationContext(_user), null, true);
+            _user.Validate();
+            _createRoomForm.User = _user;
             await LocalStorage.SetItemAsync("user", _user);
-            CreateRoomForm.User = _user;
-            await Event.CreateRoom(CreateRoomForm);
+            await Event.CreateRoom(_createRoomForm);
             _modal.Toggle();
         }
     }

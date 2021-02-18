@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using Mapster;
@@ -38,11 +37,15 @@ namespace pixit.Client.Services
             HubConnection.On<Dictionary<string, LobbyListEvent>>("SendRooms", args => _mediator.Notify(args));
             HubConnection.On<KeyValuePair<string, LobbyListEvent>>("SendRoom", args => _mediator.Notify(args));
             HubConnection.On<JoinRoomEvent>("JoinRoomEvent", args => _mediator.Notify(args));
-            HubConnection.On<SettingsModel>("UpdateRoomSettings", args => _mediator.Notify(args));
             HubConnection.On<CreateRoomEvent>("CreateRoom", args => _mediator.Notify(args));
             HubConnection.On<KickUserEvent>("KickUser", args => _mediator.Notify(args));
-            HubConnection.On<GameModel>("UpdateGameState", args => _mediator.Notify(args));
+            HubConnection.On<GameModel>("UpdateGameState", args =>
+            {
+                _state.Room.Game = args;
+                _mediator.Notify(args);
+            });
   
+            HubConnection.On<SettingsModel>("UpdateRoomSettings", args => _state.Room.Settings = args);
             HubConnection.On<UserJoinedRoomEvent>("UserJoinedRoom", args => _state.Room.Users.Add(args.Adapt<UserModel>()));
             HubConnection.On<UserLeftRoomEvent>("UserLeftRoom", args => _state.Room.Users.Remove(_state.Room.Users.FirstOrDefault(u=>u.Id == args.Id)));
             HubConnection.On<SetRoomHostEvent>("SetRoomHost", args => _state.Room.HostId = args.HostId);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
@@ -8,7 +7,6 @@ using pixit.Server.Hubs;
 using pixit.Server.Repositiories;
 using pixit.Shared.Models;
 using pixit.Shared.Models.Events;
-using StackExchange.Redis.Extensions.Core.Abstractions;
 
 namespace pixit.Server.Services
 {

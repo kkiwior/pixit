@@ -3,15 +3,23 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
+using pixit.Shared.Models.Others;
 
 namespace pixit.Shared.Models
 {
     public class GameModel : INotifyPropertyChanged
     {
         private GameState _state;
-        private Narrator _narrator;
+        private NarratorModel _narrator;
         private ObservableCollection<string> _waiting;
-        private ObservableCollection<CardOnTable> _cardsOnTable;
+        private ObservableCollection<CardOnTableModel> _cardsOnTable;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public int CardsOnTableCount { get; set; }
+        public string Clue { get; set; }
+        public List<ScoreEntryModel> Scoreboard { get; set; } = new();
+        [JsonIgnore]
+        public RNGModel RNG { get; set; }
 
         public GameState State
         {
@@ -22,7 +30,8 @@ namespace pixit.Shared.Models
                 OnPropertyChanged();
             }
         }
-        public Narrator Narrator
+        
+        public NarratorModel Narrator
         {
             get => _narrator;
             set
@@ -42,7 +51,7 @@ namespace pixit.Shared.Models
             }
         }
         
-        public ObservableCollection<CardOnTable> CardsOnTable
+        public ObservableCollection<CardOnTableModel> CardsOnTable
         {
             get => _cardsOnTable;
             set
@@ -51,25 +60,10 @@ namespace pixit.Shared.Models
                 _cardsOnTable.CollectionChanged += (_, _) => OnPropertyChanged("");
             }
         }
-
-        [JsonIgnore]
-        public RNG RNG { get; set; }
         
-        public string Clue { get; set; }
-        
-        public List<ScoreEntry> Scoreboard { get; set; } = new();
-
-        
-
-
-        public int CardsOnTableCount { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public GameModel()
         {
             RNG = new();
-            State = GameState.NarratorPicking;
             Waiting = new();
             Narrator = new();
             CardsOnTable = new();
@@ -79,51 +73,5 @@ namespace pixit.Shared.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-    }
-
-    public class CardOnTable
-    {
-        public string Id { get; set; }
-        public CardModel Card { get; set; }
-        [JsonIgnore]
-        public string UserId { get; set; }
-        [JsonIgnore]
-        public bool IsNarratorCard { get; set; }
-
-        public List<string> Votes { get; set; } = new();
-    }
-
-    public class ScoreEntry
-    {
-        public string UserId { get; set; }
-        public int Score { get; set; }
-    }
-
-    public class Narrator
-    {
-        public int Index { get; set; }
-        public string UserId { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
-        public string Token { get; set; }
-
-        public Narrator()
-        {
-            Index = -1;
-        }
-    }
-    
-
-    public class RNG
-    {
-        public int Seed { get; set; }
-        public int Increment { get; set; }
-        public int Max { get; set; }
-    }
-    
-    public enum GameState
-    {
-        NarratorPicking = 0,
-        UsersPicking = 1,
-        UsersVoting = 2
     }
 }

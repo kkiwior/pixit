@@ -17,14 +17,13 @@ namespace pixit.Shared.Utils
 
         protected override ValidationResult IsValid(object value, ValidationContext obj)
         {
-            int gender = Convert.ToInt32(obj.ObjectType.GetProperty("Gender").GetValue(obj.ObjectInstance));
+            int gender = Convert.ToInt32(obj.ObjectType.GetProperty("Gender")?.GetValue(obj.ObjectInstance));
             int val = Convert.ToInt32(value);
 
-            if (val < 0) obj.ObjectType.GetProperty(obj.MemberName).SetValue(obj.ObjectInstance, (gender == 0 ? _maxForMale - 1 : _maxForFemale - 1));
+            if (val < 0) obj.ObjectType.GetProperty(obj.MemberName!)?.SetValue(obj.ObjectInstance, (gender == 0 ? _maxForMale - 1 : _maxForFemale - 1));
             
-            // if gender is 0 (male) and value lower than male count
             if ((gender == 0 && val >= _maxForMale) || (gender == 1) && val >= _maxForFemale)
-                obj.ObjectType.GetProperty(obj.MemberName).SetValue(obj.ObjectInstance, 0);
+                obj.ObjectType.GetProperty(obj.MemberName!)?.SetValue(obj.ObjectInstance, 0);
                 
             return ValidationResult.Success;
         }

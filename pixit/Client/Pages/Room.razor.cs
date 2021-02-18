@@ -45,16 +45,21 @@ namespace pixit.Client.Pages
             StateHasChanged();
 
             await Mediator.Register<JoinRoomEvent>(HandleJoinRoom);
-            await Mediator.Register<SetRoomHostEvent>(HandleSetRoomHost);
-            await Mediator.Register<SettingsModel>(HandleSettingsUpdate);
             await Mediator.Register<KickUserEvent>(HandleKick);
             await Mediator.Register<GameModel>(HandleGameStart);
             Navigation.LocationChanged += LocationChanged;
         }
         
+        public void Dispose()
+        {
+            Mediator.Unregister<JoinRoomEvent>();
+            Mediator.Unregister<KickUserEvent>();
+            Mediator.Unregister<GameModel>();
+            Navigation.LocationChanged -= LocationChanged;
+        }
+        
         private Task HandleGameStart(GameModel arg)
         {
-            State.Room.Game = arg;
             Navigation.NavigateTo("game");
             return Task.CompletedTask;
         }
@@ -72,8 +77,8 @@ namespace pixit.Client.Pages
                 Navigation.NavigateTo("lobby");
                 return;
             }
-            await LocalStorage.SetItemAsync("token", jre.Token);
             Token = jre.Token;
+            await LocalStorage.SetItemAsync("token", Token);
             State.Room = new RoomModel(jre.Name)
             {
                 Settings = jre.Settings,
@@ -85,45 +90,18 @@ namespace pixit.Client.Pages
             StateHasChanged();
         }
 
-        private Task HandleSetRoomHost(SetRoomHostEvent e)
-        {
-            State.Room.HostId = e.HostId;
-            StateHasChanged();
-            return Task.CompletedTask;
-        }
-
-        private Task HandleSettingsUpdate(SettingsModel settings)
-        {
-            State.Room.Settings = settings;
-            StateHasChanged();
-            return Task.CompletedTask;
-        }
-
         protected async Task UpdateSettings()
         {
+            if (State.Room.HostId != State.UserId) return;
             if (State.Room.Settings.Slots >= State.Room.Users.Count && State.Room.Settings.Slots <= 20 && State.Room.Settings.MaxScore >= 5 && State.Room.Settings.MaxScore <= 100)
                 await Event.UpdateSettings(State.Room.Settings);
-        }
-
-        public void Dispose()
-        {
-            Mediator.Unregister<JoinRoomEvent>();
-            Mediator.Unregister<SetRoomHostEvent>();
-            Mediator.Unregister<SettingsModel>();
-            Mediator.Unregister<KickUserEvent>();
-            Mediator.Unregister<GameModel>();
-            Navigation.LocationChanged -= LocationChanged;
         }
 
         private void LocationChanged(object sender, LocationChangedEventArgs e)
         {
             if (State.Room?.Name != null && !e.Location.Contains("game"))
             {
-                Event.UserLeftRoom(new UserLeftRoomEvent
-                {
-                    Token = Token,
-                    RoomId = RoomId
-                });
+                Event.UserLeftRoom();
             }
         }
 
@@ -136,9 +114,9 @@ namespace pixit.Client.Pages
             });
         }
 
-        private void StartGame()
+        private async Task StartGame()
         {
-            Event.StartGame();
+            await Event.StartGame();
         }
     }
 }

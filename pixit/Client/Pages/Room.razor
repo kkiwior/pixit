@@ -11,7 +11,7 @@
 
                 @foreach (UserModel user in State.Room?.Users)
                 {
-                    <div style="margin-right: 12px; width: 150px; text-align: center; word-wrap: break-word;">
+                    <div class="player-container">
                         <Avatar IsHost="@(State.Room.HostId == user.Id)" Background="@user.Avatar.Background" Cloth="@user.Avatar.Cloth" Eye="@user.Avatar.Eye" Face="@user.Avatar.Face" Gender="@user.Avatar.Gender" Hair="@user.Avatar.Hair" Mouth="@user.Avatar.Mouth" Size="150">
                             <Controls>
                                 @if (State.UserId == State.Room.HostId)
@@ -30,11 +30,11 @@
         <div class="col-3 text-center p-4">
             <div class="form-group">
                 <label for="slots" class="form-label">Liczba graczy: @State.Room.Settings.Slots</label>
-                <input type="range" min="@(State.Room.UsersOnline > 3 ? State.Room.UsersOnline : 3)" max="20" class="form-range" id="slots" style="width: 100%;"  value="@State.Room.Settings.Slots" @oninput="@((args) => State.Room.Settings.Slots = Convert.ToInt16(args.Value))" @onchange="UpdateSettings" disabled="@(State.Room.HostId != State.UserId)">
+                <input type="range" min="@(State.Room.UsersOnline > 3 ? State.Room.UsersOnline : 3)" max="20" class="form-range" id="slots" value="@State.Room.Settings.Slots" @oninput="@((args) => State.Room.Settings.Slots = Convert.ToInt16(args.Value))" @onchange="UpdateSettings" disabled="@(State.Room.HostId != State.UserId)">
             </div>
             <div class="form-group mt-4">
                 <label for="score" class="form-label">Liczba punktów: @State.Room.Settings.MaxScore</label>
-                <input type="range" min="5" max="100" class="form-range" id="score" style="width: 100%;" value="@State.Room.Settings.MaxScore" @oninput="@((args) => State.Room.Settings.MaxScore = Convert.ToInt16(args.Value))" @onchange="UpdateSettings" disabled="@(State.Room.HostId != State.UserId)">
+                <input type="range" min="5" max="100" class="form-range" id="score" value="@State.Room.Settings.MaxScore" @oninput="@((args) => State.Room.Settings.MaxScore = Convert.ToInt16(args.Value))" @onchange="UpdateSettings" disabled="@(State.Room.HostId != State.UserId)">
             </div>
             <div class="form-group mt-4">
                 <button disabled="@(State.Room.HostId != State.UserId || State.Room.UsersOnline < 3)" @onclick="StartGame">Rozpocznij grę</button>

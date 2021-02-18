@@ -11,9 +11,9 @@ namespace pixit.Client.Utils
 
         public Task Register<T>(Func<T, Task> handler)
         {
-            lock (this._listeners)
+            lock (_listeners)
             {
-                this._listeners.Add(new Listener<T>()
+                _listeners.Add(new Listener<T>()
                 {
                     Handler = handler,
                 });
@@ -24,9 +24,9 @@ namespace pixit.Client.Utils
 
         public void Unregister<T>()
         {
-            lock (this._listeners)
+            lock (_listeners)
             {
-                this._listeners.Remove(this._listeners.OfType<Listener<T>>().FirstOrDefault());
+                _listeners.Remove(_listeners.OfType<Listener<T>>().FirstOrDefault());
             }
         }
 
@@ -34,9 +34,9 @@ namespace pixit.Client.Utils
         {
             IEnumerable<Listener<T>> eventListeners;
 
-            lock (this._listeners)
+            lock (_listeners)
             {
-                eventListeners = this._listeners.OfType<Listener<T>>();
+                eventListeners = _listeners.OfType<Listener<T>>();
             }
 
             return Task.WhenAll(eventListeners.Select(listener => listener.Handler(data)));

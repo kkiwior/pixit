@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace pixit.Shared.Models.Events
 {
@@ -12,13 +11,14 @@ namespace pixit.Shared.Models.Events
 
         public string Name { get; set; }
         public SettingsModel Settings { get; set; }
-        public ObservableCollection<UserModel> Users { get; set; } = new();
+        public ObservableCollection<UserModel> Users { get; set; }
         public string HostId { get; set; }
         public bool Started { get; set; }
 
         public JoinRoomEvent()
         {
             Settings = new();
+            Users = new();
         }
     }
 }

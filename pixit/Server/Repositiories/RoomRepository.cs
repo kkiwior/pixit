@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using pixit.Server.Hubs;
 using pixit.Shared.Models;
 using pixit.Shared.Models.Events;
 using StackExchange.Redis.Extensions.Core.Abstractions;

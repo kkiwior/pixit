@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -8,17 +6,17 @@ namespace pixit.Shared.Models
 {
     public class RoomModel : INotifyPropertyChanged
     {
-        public string Name { get; set; }
-        public int UsersOnline => Users.Count;
-        public SettingsModel Settings { get; set; }
-        public bool Started { get; set; }
         private string _hostId;
         private GameModel _game;
         private ObservableCollection<UserModel> _users;
+        private SettingsModel _settings;
         
         public event PropertyChangedEventHandler PropertyChanged;
-
-
+        
+        public string Name { get; set; }
+        public int UsersOnline => Users.Count;
+        public bool Started { get; set; }
+        
         public ObservableCollection<UserModel> Users
         {
             get => _users;
@@ -49,6 +47,17 @@ namespace pixit.Shared.Models
                 OnPropertyChanged();
             }
         }
+
+        public SettingsModel Settings
+        {
+            get => _settings;
+            set
+            {
+                _settings = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public RoomModel(string name)
         {

@@ -35,15 +35,8 @@ namespace pixit.Server.Hubs
         public override async Task OnDisconnectedAsync(Exception ex)
         {
             Context.Items.TryGetValue("room", out var roomId);
-            if (roomId.ToString() != null)
-            {
-                Room = await _rooms.GetRoomById(roomId.ToString());
-                await UserLeftRoom(new UserLeftRoomEvent()
-                {
-                    RoomId = roomId?.ToString(), 
-                    Token = Context.ConnectionId
-                });
-            }
+            Room = await _rooms.GetRoomById(roomId?.ToString());
+            await UserLeftRoom();
             await base.OnDisconnectedAsync(ex);
         }
 
@@ -73,11 +66,11 @@ namespace pixit.Server.Hubs
         }
         
 
-        public async Task UserLeftRoom(UserLeftRoomEvent data)
+        public async Task UserLeftRoom()
         {
             await _roomService.LeaveRoom(Context.Items["room"]?.ToString(), Room, Context.ConnectionId);
+            await SendRoom(Context.Items["room"]?.ToString());
             Context.Items["room"] = null;
-            await SendRoom(data.RoomId);
         }
         
         

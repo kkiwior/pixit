@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using pixit.Shared.Models;
@@ -10,6 +9,9 @@ namespace pixit.Client.Utils
     {
         private RoomModel _room;
         private ObservableCollection<CardModel> _cardDeck;
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+        
         public string UserId { get; set; }
         public string JoinRoomAfterLogin { get; set; }
 
@@ -23,18 +25,24 @@ namespace pixit.Client.Utils
                 OnPropertyChanged();
             }
         } 
+        
         public ObservableCollection<CardModel> CardDeck
         {
             get => _cardDeck;
             set
             {
                 _cardDeck = value;
-                _cardDeck.CollectionChanged += (sender, args) => OnPropertyChanged("");
+                _cardDeck.CollectionChanged += (_, _) => OnPropertyChanged("");
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        public StateContainer()
+        {
+            Room = new RoomModel(null);
+            _cardDeck = new();
+        }
+        
+        
         protected void OnPropertyChanged([CallerMemberName] string name = null!)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -43,12 +51,6 @@ namespace pixit.Client.Utils
         protected void OnNestedPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             PropertyChanged?.Invoke(this, args);
-        }
-
-        public StateContainer()
-        {
-            Room = new RoomModel(null);
-            _cardDeck = new();
         }
     }
 }

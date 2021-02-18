@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace pixit.Shared.Models
+namespace pixit.Shared.Models.Events
 {
     public class CreateRoomEvent
     {

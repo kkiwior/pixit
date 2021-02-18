@@ -1,5 +1,6 @@
 ﻿@page "/game"
 @using pixit.Shared.Models
+@using pixit.Shared.Models.Others
 
 <div class="col-12 col-md-3 col-xl-2 p-0 primary">
     <div class="d-flex flex-column playerlist">
@@ -19,7 +20,7 @@
                         <div class="container-fluid p-0">
                             <div class="row">
                                 <div class="name col-10 col-md-11 my-auto">&nbsp;@user.Name</div>
-                                <div class="score col-2 col-md-1 p-0 my-auto ml-auto">@(State.Room.Game.Scoreboard.Find(u=>u.UserId == user.Id).Score)</div>
+                                <div class="score col-2 col-md-1 p-0 my-auto ml-auto">@(State.Room.Game.Scoreboard.Find(u=>u.UserId == user.Id)?.Score)</div>
                             </div>
                         </div>
                         </div>
@@ -43,7 +44,7 @@
                 @for (var i = 0; i < State.Room.Game.CardsOnTableCount; ++i)
                 {
                     <div class="cardcover">
-                        <img class="rounded-3 shadow" src="images/cardcover.webp"/>
+                        <img class="rounded-3 shadow" src="images/cardcover.webp" alt=""/>
                     </div>
                 }
             </div>
@@ -53,10 +54,10 @@
     {
         <div class="container-fluid vh-100 p-0">
             <div class="card-container usercard-container" data-players="@State.Room.Users.Count">
-                @foreach (CardOnTable card in State.Room.Game.CardsOnTable)
+                @foreach (CardOnTableModel card in State.Room.Game.CardsOnTable)
                 {
                     <div class="cardc" @onclick='() => VoteCard(card.Id)'>
-                        <img class="rounded-3 shadow" src="images/cards/card@(card.Card.Id).webp"/>
+                        <img class="rounded-3 shadow" src="images/cards/card@(card.Card.Id).webp" alt=""/>
                     </div>
                 }
             </div>
@@ -69,13 +70,13 @@
                 @if (State.Room.Game.Narrator.UserId == State.UserId)
                 {
                     <div class="clue">
-                        <textarea placeholder="Wskazówka..." @bind="Clue"></textarea>
+                        <textarea placeholder="Wskazówka..." @bind="_clue"></textarea>
                     </div>
                 }
                 @foreach (CardModel card in State.CardDeck)
                 {
                     <div class="cardd" @onclick='() => SendCard(card)'>
-                        <img class="rounded-3 shadow" src="images/cards/card@(card.Id).webp"/>
+                        <img class="rounded-3 shadow" src="images/cards/card@(card.Id).webp" alt=""/>
                     </div>
                 }
             </div>

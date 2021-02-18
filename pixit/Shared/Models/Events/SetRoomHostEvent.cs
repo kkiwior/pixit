@@ -6,7 +6,6 @@
 
         public SetRoomHostEvent()
         {
-            
         }
         
         public SetRoomHostEvent(string host)

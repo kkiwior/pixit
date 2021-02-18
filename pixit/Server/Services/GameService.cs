@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using pixit.Client.Pages;
 using pixit.Server.Hubs;
 using pixit.Server.Repositiories;
 using pixit.Shared.Models;
 using pixit.Shared.Models.Events;
+using pixit.Shared.Models.Others;
 
 namespace pixit.Server.Services
 {
@@ -31,13 +30,13 @@ namespace pixit.Server.Services
             room.Game.RNG.Increment = rnd.Next(1, 200);
             room.Game.RNG.Seed = rnd.Next(1, 1500);
             room.Game.RNG.Max = 1500;
-            room.Users.ToList().ForEach(u => room.Game.Scoreboard.Add(new ScoreEntry()
+            room.Users.ToList().ForEach(u => room.Game.Scoreboard.Add(new ScoreEntryModel()
             {
                 UserId = u.Id,
                 Score = 0
             }));
             await ChangeNarrator(room);
-            await RefillCardsForEveryone(roomId, room);
+            await RefillCardsForEveryone(room);
             await _rooms.Save(roomId, room);
             await _hub.Clients.Group(roomId).SendAsync("UpdateGameState", room.Game);
         }
@@ -54,10 +53,10 @@ namespace pixit.Server.Services
             room.Game.CardsOnTable.Clear();
         }
 
-        private async Task RefillCardsForEveryone(string roomId, RoomModel room)
+        private async Task RefillCardsForEveryone(RoomModel room)
         {
             List<Task> tasks = new();
-            room.Users.ToList().ForEach(async u =>
+            room.Users.ToList().ForEach(u =>
             {
                 while (u.CardDeck.Count < 6)
                 {
@@ -67,7 +66,7 @@ namespace pixit.Server.Services
             await Task.WhenAll(tasks);
         }
 
-        private async Task RefillUserCard(UserModel user, RNG rng)
+        private async Task RefillUserCard(UserModel user, RNGModel rng)
         {
             var card = await Task.FromResult(new CardModel()
             {
@@ -82,7 +81,7 @@ namespace pixit.Server.Services
         {
             UserModel user = await Task.FromResult(room.Users.FirstOrDefault(u => u.Token == connectionid));
             if (user == null || !room.Game.Waiting.Contains(user.Id) || user.CardDeck.FirstOrDefault(c=>c.Id == cardEvent.Card.Id) == null) return;
-            CardOnTable card = new CardOnTable()
+            CardOnTableModel card = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Card = cardEvent.Card,
@@ -105,8 +104,8 @@ namespace pixit.Server.Services
 
             if (room.Game.Waiting.Count == 0)
             {
-                if (room.Game.State == GameState.UsersPicking) await ShowCards(roomId, room);
-                if (room.Game.State == GameState.NarratorPicking) await UsersPickingState(roomId, room, user.Id);
+                if (room.Game.State == GameState.UsersPicking) await ShowCards(room);
+                if (room.Game.State == GameState.NarratorPicking) await UsersPickingState(room, user.Id);
             }
             
             await _rooms.Save(roomId, room);
@@ -115,18 +114,18 @@ namespace pixit.Server.Services
             await _hub.Clients.Group(roomId).SendAsync("UpdateGameState", room.Game);
         }
 
-        private async Task ShowCards(string roomId, RoomModel room)
+        private async Task ShowCards(RoomModel room)
         {
             List<string> waiting = await Task.FromResult(room.Users.ToList().Select(u => u.Id).ToList());
             waiting.Remove(room.Game.Narrator.UserId);
             waiting.ForEach(u => room.Game.Waiting.Add(u));
             room.Game.State = GameState.UsersVoting;
-            room.Game.CardsOnTable = new(room.Game.CardsOnTable.OrderBy(c => Guid.NewGuid()));
+            room.Game.CardsOnTable = new(room.Game.CardsOnTable.OrderBy(_ => Guid.NewGuid()));
         }
 
-        private async Task UsersPickingState(string roomId, RoomModel room, string userId)
+        private async Task UsersPickingState(RoomModel room, string userId)
         {
-            List<string> waiting = room.Users.ToList().Select(u => u.Id).ToList();
+            List<string> waiting = await Task.FromResult(room.Users.ToList().Select(u => u.Id).ToList());
             waiting.Remove(userId);
             waiting.ForEach(u => room.Game.Waiting.Add(u));
             room.Game.State = GameState.UsersPicking;
@@ -136,14 +135,14 @@ namespace pixit.Server.Services
         {
             UserModel user = await Task.FromResult(room.Users.FirstOrDefault(u => u.Token == connectionid));
             if (user == null || !room.Game.Waiting.Contains(user.Id)) return;
-            CardOnTable card = await Task.FromResult(room.Game.CardsOnTable.FirstOrDefault(c => c.Id == cardId));
+            CardOnTableModel card = await Task.FromResult(room.Game.CardsOnTable.FirstOrDefault(c => c.Id == cardId));
             if (card == null || card.UserId == user.Id) return;
             card.Votes.Add(user.Id);
             room.Game.Waiting.Remove(user.Id);
 
             if (room.Game.Waiting.Count == 0)
             {
-                await SetScore(roomId, room);
+                await SetScore(room);
                 await ChangeNarrator(room);
             }
             
@@ -151,10 +150,10 @@ namespace pixit.Server.Services
             await _hub.Clients.Group(roomId).SendAsync("UpdateGameState", room.Game);
         }
 
-        private async Task SetScore(string roomId, RoomModel room)
+        private async Task SetScore(RoomModel room)
         {
-            CardOnTable narratorCard = await Task.FromResult(room.Game.CardsOnTable.FirstOrDefault(c=>c.IsNarratorCard));
-            if (narratorCard.Votes.Count == room.UsersOnline - 1 || narratorCard.Votes.Count == 0)
+            CardOnTableModel narratorCard = await Task.FromResult(room.Game.CardsOnTable.FirstOrDefault(c=>c.IsNarratorCard));
+            if (narratorCard?.Votes.Count == room.UsersOnline - 1 || narratorCard?.Votes.Count == 0)
             {
                 room.Game.Scoreboard.ForEach(s =>
                 {
@@ -162,20 +161,20 @@ namespace pixit.Server.Services
                 });
                 return;
             }
-            List<CardOnTable> cards = await Task.FromResult(room.Game.CardsOnTable.ToList());
+            List<CardOnTableModel> cards = await Task.FromResult(room.Game.CardsOnTable.ToList());
             cards.ForEach(c =>
             {
                 if (c.IsNarratorCard)
                 {
                     c.Votes.ForEach(v =>
                     {
-                        room.Game.Scoreboard.Find(s => s.UserId == v).Score += 3;
-                        room.Game.Scoreboard.Find(s => s.UserId == c.UserId).Score += 3;
+                        room.Game.Scoreboard.First(s => s.UserId == v).Score += 3;
+                        room.Game.Scoreboard.First(s => s.UserId == c.UserId).Score += 3;
                     });
                 }
                 else
                 {
-                    room.Game.Scoreboard.Find(s => s.UserId == c.UserId).Score += (1 * c.Votes.Count);
+                    room.Game.Scoreboard.First(s => s.UserId == c.UserId).Score += (1 * c.Votes.Count);
                 }
             });
         }

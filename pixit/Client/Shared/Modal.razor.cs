@@ -8,11 +8,11 @@ namespace pixit.Client.Shared
         [Parameter] public RenderFragment Body { get; set; }
         [Parameter] public RenderFragment Footer { get; set; }
 
-        private bool display = false;
+        private bool _display = false;
 
         public void Toggle()
         {
-            display = !display;
+            _display = !_display;
         }
     }
 }

@@ -4,6 +4,11 @@
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public AvatarModel Avatar { get; set; } = new();
+        public AvatarModel Avatar { get; set; }
+
+        public UserJoinedRoomEvent()
+        {
+            Avatar = new();
+        }
     }
 }
