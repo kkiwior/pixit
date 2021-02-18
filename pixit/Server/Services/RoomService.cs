@@ -36,7 +36,7 @@ namespace pixit.Server.Services
         public async Task<JoinRoomEvent> JoinRoom(string roomId, UserModel user, string connectionid)
         {
             RoomModel room = await _rooms.GetRoomById(roomId);
-            if (room == null || room.Settings.Slots <= room.UsersOnline) return null;
+            if (room == null || room.Settings.Slots <= room.UsersOnline || room.Started) return null;
             user.Token = connectionid;
             user.Id = Guid.NewGuid().ToString();
             room.Users.Add(user);
