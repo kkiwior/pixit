@@ -42,11 +42,18 @@ namespace pixit.Client.Pages
 
         private async Task SendCard(CardModel card)
         {
+            if (!State.Room.Game.Waiting.Contains(State.UserId)) return;
             await Event.SelectCard(new SelectCardEvent()
             {
                 Card = card,
                 Clue = (State.Room.Game.Narrator.UserId == State.UserId ? Clue : null)
             });
+        }
+
+        private async Task VoteCard(string cardId)
+        {
+            if (!State.Room.Game.Waiting.Contains(State.UserId)) return;
+            await Event.VoteCard(cardId);
         }
     }
 }

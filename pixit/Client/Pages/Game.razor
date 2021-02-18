@@ -19,7 +19,7 @@
                         <div class="container-fluid p-0">
                             <div class="row">
                                 <div class="name col-10 col-md-11 my-auto">&nbsp;@user.Name</div>
-                                <div class="score col-2 col-md-1 p-0 my-auto ml-auto">22</div>
+                                <div class="score col-2 col-md-1 p-0 my-auto ml-auto">@(State.Room.Game.Scoreboard.Find(u=>u.UserId == user.Id).Score)</div>
                             </div>
                         </div>
                         </div>
@@ -29,6 +29,13 @@
         </div>
 </div>
 <div class="col-12 col-md-9 col-xl-10 p-0">
+    @if (State.Room.Game.State == GameState.UsersPicking || State.Room.Game.State == GameState.UsersVoting)
+    {
+        <div class="clue-show col-12 text-center">
+            @State.Room.Game.Clue
+        </div>
+    }
+    
     @if (State.Room.Game.State == GameState.UsersPicking)
     {
         <div class="container-fluid vh-100 p-0">
@@ -40,16 +47,16 @@
                     </div>
                 }
             </div>
-        </div>       
+        </div>
     }
     @if (State.Room.Game.State == GameState.UsersVoting)
     {
         <div class="container-fluid vh-100 p-0">
             <div class="card-container usercard-container" data-players="@State.Room.Users.Count">
-                @foreach (CardModel card in State.CardDeck)
+                @foreach (CardOnTable card in State.Room.Game.CardsOnTable)
                 {
-                    <div class="cardc">
-                        <img class="rounded-3 shadow" src="images/cards/card@(card.Id).webp"/>
+                    <div class="cardc" @onclick='() => VoteCard(card.Id)'>
+                        <img class="rounded-3 shadow" src="images/cards/card@(card.Card.Id).webp"/>
                     </div>
                 }
             </div>

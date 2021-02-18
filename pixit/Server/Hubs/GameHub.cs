@@ -18,5 +18,10 @@ namespace pixit.Server.Hubs
         {
             await _games.SelectCard(Context.Items["room"]?.ToString(), Room, Context.ConnectionId, cardEvent);
         }
+        
+        public async Task VoteCard(string cardId)
+        {
+            await _games.VoteCard(Context.Items["room"]?.ToString(), Room, Context.ConnectionId, cardId);
+        }
     }
 }
