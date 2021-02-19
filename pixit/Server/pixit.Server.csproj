@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>8e89b533-ff6c-4e9b-a3f2-6345d923fc45</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
     <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="6.3.6" />
     <PackageReference Include="StackExchange.Redis.Extensions.Newtonsoft" Version="6.3.6" />
