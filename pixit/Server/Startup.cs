@@ -12,7 +12,6 @@ using pixit.Server.Repositiories;
 using pixit.Server.Services;
 using pixit.Server.Utils;
 using StackExchange.Redis.Extensions.Core;
-using StackExchange.Redis.Extensions.Core.Abstractions;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
 
@@ -43,10 +42,7 @@ namespace pixit.Server
             {
                 ContractResolver = new RedisContractResolver()
             };
-            services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>((options) =>
-            {
-                return Configuration.GetSection("Redis").Get<RedisConfiguration>();
-            });
+            services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(Configuration.GetSection("Redis").Get<RedisConfiguration>());
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSingleton<RoomRepository>();

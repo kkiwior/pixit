@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 	<InvariantGlobalization>true</InvariantGlobalization>
 	<Nullable>disable</Nullable>
 	<UserSecretsId>4426098c-6a76-4838-8dfa-da1f7645deac</UserSecretsId>
@@ -12,12 +12,12 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="3.0.0" />
     <PackageReference Include="Mapster" Version="7.1.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0-preview.1.21103.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0-preview.1.21103.6" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0-preview.1.*" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.0-preview.1.*" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
-    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0-preview.1.21102.12" />
   </ItemGroup>
 
   <ItemGroup>
