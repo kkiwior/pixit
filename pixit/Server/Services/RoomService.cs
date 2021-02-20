@@ -94,6 +94,7 @@ namespace pixit.Server.Services
             }
             
             UserModel user = await Task.FromResult(room.Users.FirstOrDefault(u => u.Token == token));
+            room.Game.Waiting.Remove(user.Id);
             room.Users.Remove(user);
             await _hub.Groups.RemoveFromGroupAsync(token, roomId);
             await _hub.Groups.AddToGroupAsync(token, "lobby");
