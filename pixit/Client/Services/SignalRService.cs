@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using Mapster;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,8 @@ namespace pixit.Client.Services
                 .WithUrl(client.BaseAddress?.AbsoluteUri + "roomhub")
                 .AddJsonProtocol(options =>
                 {
-                    options.PayloadSerializerOptions.IgnoreNullValues = true;
+                    //options.PayloadSerializerOptions.IgnoreNullValues = true;
+                    options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 })
                 .Build();
 

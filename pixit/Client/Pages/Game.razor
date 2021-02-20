@@ -3,6 +3,10 @@
 @using pixit.Shared.Models.Others
 
 <div class="col-12 col-md-3 col-xl-2 p-0 primary">
+    @if(State.Room.Game.Waiting.Contains(State.UserId))
+    {
+        <audio src="alert.mp3" autoplay></audio>
+    }
     <div class="d-flex flex-column playerlist">
         @foreach (UserModel user in State.Room.Users)
         {
