@@ -29,15 +29,15 @@
         </div>
         <div class="col-3 text-center p-4">
             <div class="form-group">
-                <label for="slots" class="form-label">Liczba graczy: @State.Room.Settings.Slots</label>
+                <label for="slots" class="form-label">@Localization["PlayersCount"]: @State.Room.Settings.Slots</label>
                 <input type="range" min="@(State.Room.UsersOnline > 3 ? State.Room.UsersOnline : 3)" max="20" class="form-range" id="slots" value="@State.Room.Settings.Slots" @oninput="@((args) => State.Room.Settings.Slots = Convert.ToInt16(args.Value))" @onchange="UpdateSettings" disabled="@(State.Room.HostId != State.UserId)">
             </div>
             <div class="form-group mt-4">
-                <label for="score" class="form-label">Liczba punktów: @State.Room.Settings.MaxScore</label>
+                <label for="score" class="form-label">@Localization["ScoreCount"]: @State.Room.Settings.MaxScore</label>
                 <input type="range" min="5" max="100" class="form-range" id="score" value="@State.Room.Settings.MaxScore" @oninput="@((args) => State.Room.Settings.MaxScore = Convert.ToInt16(args.Value))" @onchange="UpdateSettings" disabled="@(State.Room.HostId != State.UserId)">
             </div>
             <div class="form-group mt-4">
-                <button disabled="@(State.Room.HostId != State.UserId || State.Room.UsersOnline < 3)" @onclick="StartGame">Rozpocznij grę</button>
+                <button disabled="@(State.Room.HostId != State.UserId || State.Room.UsersOnline < 3)" @onclick="StartGame">@Localization["StartGame"]</button>
             </div>
         </div>
     </div>

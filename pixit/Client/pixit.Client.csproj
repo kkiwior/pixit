@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	<InvariantGlobalization>true</InvariantGlobalization>
+	<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
 	<Nullable>disable</Nullable>
 	<UserSecretsId>4426098c-6a76-4838-8dfa-da1f7645deac</UserSecretsId>
 	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -25,8 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Resources" />
     <Folder Include="wwwroot\css\bootstrap" />
     <Folder Include="wwwroot\images\avatar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Localization, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\6.0.0-preview.1.21103.6\ref\net6.0\Microsoft.AspNetCore.Localization.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

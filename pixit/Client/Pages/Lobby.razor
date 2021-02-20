@@ -5,7 +5,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
-        <span style="vertical-align: middle;">Stwórz pokój</span>
+        <span style="vertical-align: middle;">@Localization["CreateRoom"]</span>
     </button>
 </div>
 <div class="col-sm-12 col-md-8 col-xl-4 center-block">
@@ -18,9 +18,8 @@
                         @_roomList[id].Name
                     </div>
                     <div class="col-12 col-md-6 text-right">
-                        <div><span class="infolabel">Graczy: </span>@_roomList[id].UsersOnline/@_roomList[id].Settings.Slots</div>
-                        <div><span class="infolabel">Talia kart: </span>@_roomList[id].Settings.CardsCount</div>
-                        <div><span class="infolabel">Max. punktów: </span>@_roomList[id].Settings.MaxScore</div>
+                        <div><span class="infolabel">@Localization["Players"]: </span>@_roomList[id].UsersOnline/@_roomList[id].Settings.Slots</div>
+                        <div><span class="infolabel">Max. @Localization["Scores"]: </span>@_roomList[id].Settings.MaxScore</div>
                     </div>
                 </div>
             </div>
@@ -35,7 +34,7 @@
             <EditForm Model="@_createRoomForm" OnValidSubmit="@CreateRoom">
                 <DataAnnotationsValidator />
                 <div class="form-group">
-                    <label for="name">Nazwa pokoju</label>
+                    <label for="name">@Localization["RoomName"]</label>
                     <InputText id="name" @bind-Value="_createRoomForm.Name" class="form-control" />
                     <ValidationMessage For="()=> _createRoomForm.Name" />
                 </div>
@@ -44,7 +43,7 @@
                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                        </svg>
-                       <span style="vertical-align: middle;">Stwórz</span>
+                       <span style="vertical-align: middle;">@Localization["Create"]</span>
                    </button>                     
                 </div>
             </EditForm>

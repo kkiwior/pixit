@@ -1,0 +1,6 @@
+﻿<div class="text-center">
+    @foreach(String culture in _supportedCultures)
+    {
+        <img style="border: 1px solid black; margin: 4px; cursor: pointer;" src="images/flags/@(culture).webp" @onclick="@(()=>SetCulture(culture))"/>
+    }
+</div>

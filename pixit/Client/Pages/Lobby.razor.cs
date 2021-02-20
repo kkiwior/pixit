@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using pixit.Client.Services;
 using pixit.Client.Shared;
 using pixit.Client.Utils;
@@ -18,6 +19,8 @@ namespace pixit.Client.Pages
         [Inject] private SendEventService Event { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
+        [Inject] private IStringLocalizer<Language> Localization { get; set; }
+
         
         private Modal _modal = new();
         private UserModel _user;

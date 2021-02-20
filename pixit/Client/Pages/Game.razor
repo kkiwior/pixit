@@ -74,7 +74,7 @@
                 @if (State.Room.Game.Narrator.UserId == State.UserId)
                 {
                     <div class="clue">
-                        <textarea placeholder="Wskazówka..." @bind="_clue"></textarea>
+                        <textarea placeholder="@(Localization["Clue"])..." @bind="_clue"></textarea>
                     </div>
                 }
                 @foreach (CardModel card in State.CardDeck)

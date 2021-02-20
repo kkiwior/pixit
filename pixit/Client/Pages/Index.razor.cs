@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using pixit.Client.Utils;
 using pixit.Shared.Models;
 
@@ -13,6 +14,7 @@ namespace pixit.Client.Pages
         [Inject] private ILocalStorageService LocalStorage { get; set; }
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
+        [Inject] private IStringLocalizer<Language> Localization { get; set; }
 
         private UserModel _user = new();
 

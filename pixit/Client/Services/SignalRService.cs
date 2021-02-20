@@ -25,8 +25,8 @@ namespace pixit.Client.Services
                 .WithUrl(client.BaseAddress?.AbsoluteUri + "roomhub")
                 .AddJsonProtocol(options =>
                 {
-                    //options.PayloadSerializerOptions.IgnoreNullValues = true;
-                    options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    options.PayloadSerializerOptions.IgnoreNullValues = true;
+                    //options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 })
                 .Build();
 

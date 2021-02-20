@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using pixit.Client.Services;
 using pixit.Client.Utils;
@@ -13,6 +14,8 @@ namespace pixit.Client.Pages
         [Inject] private StateContainer State { get; set; }
         [Inject] private IJSRuntime JsRuntime { get; set; }
         [Inject] private SendEventService Event { get; set; }
+        [Inject] private IStringLocalizer<Language> Localization { get; set; }
+
 
         private string _clue;
 
