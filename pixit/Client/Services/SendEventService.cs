@@ -22,5 +22,6 @@ namespace pixit.Client.Services
         public async Task StartGame() => await _signalr.HubConnection.SendAsync("StartGame");
         public async Task SelectCard(SelectCardEvent card) => await _signalr.HubConnection.SendAsync("SelectCard", card);
         public async Task VoteCard(string cardId) => await _signalr.HubConnection.SendAsync("VoteCard", cardId);
+        public async Task Reconnect(ReconnectToGameEvent args) => await _signalr.HubConnection.SendAsync("Reconnect", args);
     }
 }

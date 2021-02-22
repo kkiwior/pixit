@@ -21,8 +21,7 @@ namespace pixit.Client.Pages
         [Inject] private NavigationManager Navigation { get; set; }
         [Inject] private StateContainer State { get; set; }
         [Inject] private IStringLocalizer<Language> Localization { get; set; }
-
-        private string Token { get; set; }
+        
         private UserModel User { get; set; }
 
         protected override async Task OnInitializedAsync()
@@ -37,10 +36,10 @@ namespace pixit.Client.Pages
                 return;
             }
             User.Validate();
-
+            
             await Event.UserJoinRoom(new JoinRoomEvent()
             {
-                RoomId = RoomId,
+                RoomId = RoomId, 
                 User = User
             });
 
@@ -66,10 +65,10 @@ namespace pixit.Client.Pages
             return Task.CompletedTask;
         }
 
-        private Task HandleKick(KickUserEvent arg)
+        private async Task HandleKick(KickUserEvent arg)
         {
+            await LocalStorage.RemoveItemAsync("token");
             Navigation.NavigateTo("lobby");
-            return Task.CompletedTask;
         }
 
         protected async Task HandleJoinRoom(JoinRoomEvent jre)
@@ -77,20 +76,9 @@ namespace pixit.Client.Pages
             if (jre.Started)
             {
                 Navigation.NavigateTo("lobby");
-                return;
             }
-            Token = jre.Token;
-            await LocalStorage.SetItemAsync("token", Token);
-            State.Room = new RoomModel(jre.Name)
-            {
-                Settings = jre.Settings,
-                Users = jre.Users,
-                Started = jre.Started,
-                HostId = jre.HostId
-            };
-            State.UserId = jre.UserId;
-            StateHasChanged();
         }
+        
 
         protected async Task UpdateSettings()
         {

@@ -34,9 +34,17 @@ namespace pixit.Server.Hubs
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            Context.Items.TryGetValue("room", out var roomId);
-            Room = await _rooms.GetRoomById(roomId?.ToString());
-            await UserLeftRoom();
+            try
+            {
+                Context.Items.TryGetValue("room", out var roomId);
+                Room = await _rooms.GetRoomById(roomId?.ToString());
+                await UserLeftRoom(true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             await base.OnDisconnectedAsync(ex);
         }
 
@@ -66,9 +74,9 @@ namespace pixit.Server.Hubs
         }
         
 
-        public async Task UserLeftRoom()
+        public async Task UserLeftRoom(bool disconnected = false)
         {
-            await _roomService.LeaveRoom(Context.Items["room"]?.ToString(), Room, Context.ConnectionId);
+            await _roomService.LeaveRoom(Context.Items["room"]?.ToString(), Room, Context.ConnectionId, true);
             await SendRoom(Context.Items["room"]?.ToString());
             Context.Items["room"] = null;
         }
@@ -92,7 +100,7 @@ namespace pixit.Server.Hubs
             Context.Items["room"] = roomId;
             await SendRoom(roomId);
             if (jre.Users.Count == 1) await _roomService.SetRoomHost(roomId, Room);
-        }    
+        }
         
 
         public async Task UpdateSettings(SettingsModel settings)

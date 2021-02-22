@@ -47,7 +47,7 @@ namespace pixit.Server.Services
         }
         
         
-        public async Task LeaveRoom(string roomId, RoomModel room, string connectionid)
+        public async Task LeaveRoom(string roomId, RoomModel room, string connectionid, bool disconnected = false)
         {
             if (room.UsersOnline == 1)
             {
@@ -55,7 +55,7 @@ namespace pixit.Server.Services
                 return;
             }
             
-            UserModel user = await RemoveUserFromRoom(roomId, room, null, connectionid);
+            UserModel user = await RemoveUserFromRoom(roomId, room, null, connectionid, disconnected);
             await _rooms.Save(roomId, room);
             if (room.Settings.HostToken == user?.Token) await SetRoomHost(roomId, room);
         }
@@ -86,7 +86,7 @@ namespace pixit.Server.Services
             return user.Token;
         }
 
-        public async Task<UserModel> RemoveUserFromRoom(string roomId, RoomModel room, string userId = null, string token = null)
+        public async Task<UserModel> RemoveUserFromRoom(string roomId, RoomModel room, string userId = null, string token = null, bool disconnected = false)
         {
             if (token == null)
             {
@@ -94,8 +94,16 @@ namespace pixit.Server.Services
             }
             
             UserModel user = await Task.FromResult(room.Users.FirstOrDefault(u => u.Token == token));
-            room.Game.Waiting.Remove(user.Id);
-            room.Users.Remove(user);
+            if (user == null) return null;
+            if (disconnected)
+            {
+                user.Disconnected = true;
+            }
+            else
+            {
+                room.Game.Waiting.Remove(user.Id);
+                room.Users.Remove(user);            
+            }
             await _hub.Groups.RemoveFromGroupAsync(token, roomId);
             await _hub.Groups.AddToGroupAsync(token, "lobby");
             await _hub.Clients.Group(roomId).SendAsync("UserLeftRoom", new UserLeftRoomEvent(user?.Id));

@@ -19,5 +19,11 @@ namespace pixit.Server.Hubs
         {
             await _games.VoteCard(Context.Items["room"]?.ToString(), Room, Context.ConnectionId, cardId);
         }
+
+        public async Task Reconnect(ReconnectToGameEvent e)
+        {
+            await _games.Reconnect(e, Context.ConnectionId);
+            Context.Items["room"] = e.RoomId;
+        }
     }
 }

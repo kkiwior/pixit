@@ -22,6 +22,8 @@ namespace pixit.Shared.Models
         [NestedObjectValidation]
         public AvatarModel Avatar { get; set; } = new();
 
+        public bool Disconnected { get; set; } = false;
+
         public void Validate()
         {
             ValidationContext vc = new ValidationContext(Avatar);

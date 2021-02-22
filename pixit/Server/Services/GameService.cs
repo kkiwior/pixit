@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using pixit.Server.Hubs;
 using pixit.Server.Repositiories;
@@ -39,6 +40,31 @@ namespace pixit.Server.Services
             await RefillCardsForEveryone(room);
             await _rooms.Save(roomId, room);
             await _hub.Clients.Group(roomId).SendAsync("UpdateGameState", room.Game);
+        }
+
+        public async Task Reconnect(ReconnectToGameEvent e, string connectionid)
+        {
+            RoomModel room = await _rooms.GetRoomById(e.RoomId);
+            UserModel user = room.Users.First(u => u.Token == e.Token && u.Disconnected);
+            if (user == null) throw new ArgumentException();
+            user.Disconnected = false;
+            user.Token = connectionid;
+            JoinRoomEvent jre = room.Adapt<JoinRoomEvent>();
+            jre.Token = user.Token;
+            jre.RoomId = e.RoomId;
+            jre.UserId = user.Id;
+            await _hub.Clients.Client(connectionid).SendAsync("JoinRoomEvent", jre);
+            await _hub.Groups.AddToGroupAsync(connectionid, e.RoomId);
+            await _hub.Clients.Client(connectionid).SendAsync("UpdateGameState", room.Game);
+            await _hub.Clients.GroupExcept(e.RoomId, connectionid)
+                .SendAsync("UserJoinedRoom", user.Adapt<UserJoinedRoomEvent>());
+            List<Task> cards = new();
+            foreach (CardModel card in user.CardDeck)
+            {
+                cards.Add(_hub.Clients.Client(connectionid).SendAsync("RefillCards", card));
+            }
+            await Task.WhenAll(cards);
+            await _rooms.Save(e.RoomId, room);
         }
 
         private async Task ChangeNarrator(RoomModel room)

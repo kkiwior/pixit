@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
@@ -14,6 +15,8 @@ namespace pixit.Client.Pages
         [Inject] private StateContainer State { get; set; }
         [Inject] private IJSRuntime JsRuntime { get; set; }
         [Inject] private SendEventService Event { get; set; }
+        [Inject] private ILocalStorageService LocalStorage { get; set; }
+
         [Inject] private IStringLocalizer<Language> Localization { get; set; }
 
 
@@ -21,6 +24,11 @@ namespace pixit.Client.Pages
 
         protected override Task OnInitializedAsync()
         {
+            if (State.Room.Name == null)
+            {
+                TryReconnect();
+            }
+            
             State.PropertyChanged += (_, _) => StateHasChanged();
             return base.OnInitializedAsync();
         }
@@ -31,6 +39,17 @@ namespace pixit.Client.Pages
             {
                 await JsRuntime.InvokeVoidAsync("handleResize");
             }
+        }
+
+        private async Task TryReconnect()
+        {
+            string roomId = await LocalStorage.GetItemAsync<string>("room");
+            string token = await LocalStorage.GetItemAsync<string>("token");
+            await Event.Reconnect(new ReconnectToGameEvent()
+            {
+                RoomId = roomId,
+                Token = token
+            });
         }
 
         private async Task SendCard(CardModel card)
